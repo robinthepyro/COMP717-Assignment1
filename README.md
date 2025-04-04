@@ -4,5 +4,5 @@ The games will be TicTacToe, Nim, and Wolf vs Dogs. There will be a heavy relian
 complexity of the games</p>
 <p>I really don't know what else to write here....</p>
 <hr/>
-<p>Wish us Luck!</p>
+
 <p>Robin and Dashie</p>
