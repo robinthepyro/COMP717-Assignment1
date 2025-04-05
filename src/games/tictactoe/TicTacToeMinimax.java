@@ -1,4 +1,7 @@
-package games;
+// Still needs the minimax algorithm split out into it's own class.
+// Idealy the game state and ui should be split into their own as well
+
+package games.tictactoe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
