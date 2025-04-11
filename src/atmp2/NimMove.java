@@ -19,17 +19,6 @@ public class NimMove implements Move<NimMove> {
         return "Remove " + pips + " from pile " + pileIndex;
     }
 
-
-    // @Override
-    // public boolean equals(Object o) {
-    //     // SMELLY SMELLY CODE!!!
-    //     // FIXME! Using instanceof is kinda gross, this should be looked at
-    //     // Also, apparently having .equals() in this class might not be best practice?
-    //     // Also, also, I KNOW that this method is never explicitly called, however
-    //     // it is IMPLICITLY called by .contains() SO DON'T DELETE IT!!!!!
-    //     if (!(o instanceof NimMove other)) return false;
-    //     return pileIndex == other.pileIndex && pips == other.pips;
-    // }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

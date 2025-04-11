@@ -1,50 +1,80 @@
+//TODO! comment this code better
+
 package atmp2;
 
 import java.util.Scanner;
 import java.util.List;
 
 public class NimGame {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    // Constants for Player types
+    public static final int AI_PLAYER = 1;
+    public static final int HUMAN_PLAYER = 2;
 
+    private static final Scanner scanner = new Scanner(System.in);
+    private static Minimax<NimMove, NimGameState> minimax;
+
+    public static void run() {
         System.out.println("Welcome to Misère Nim!");
+        NimGameState state = initializeGame();
+        playGame(state);
+    }
+
+    private static NimGameState initializeGame() {
+        // Player choice for first turn
+        boolean playerTurn = getPlayerChoice();
+        
+        // Initializing game state
+        NimGameState state = new NimGameState(playerTurn);
+        
+        // Get Minimax depth from the user
+        int depth = getMinimaxDepth();
+        minimax = new Minimax<>(depth);
+        
+        return state;
+    }
+
+    private static boolean getPlayerChoice() {
         System.out.print("Do you want to go first? (y/n): ");
-        boolean playerTurn = scanner.nextLine().trim().toLowerCase().startsWith("y");
+        String input = scanner.nextLine().trim().toLowerCase();
+        return input.startsWith("y");
+    }
 
-        MisereNimGameState state = new MisereNimGameState(playerTurn);
+    private static int getMinimaxDepth() {
+        while (true) {
+            try {
+                System.out.print("Enter Minimax search depth: ");
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid integer.");
+            }
+        }
+    }
 
-        System.out.print("Enter Minimax search depth: ");
-        int depth = Integer.parseInt(scanner.nextLine());
-        Minimax<NimMove, MisereNimGameState> minimax = new Minimax<>(depth);
+    private static void playGame(NimGameState state) {
+        boolean playerTurn = state.getPlayer() == HUMAN_PLAYER;
 
         // Game loop
         while (true) {
             state.displayGameState();
-
-            if (state.isGameOver()) {
-                break; // break after showing the final move
+            if (state.isTerminal()) {
+                break; // end the game if it's terminal
             }
 
             if (playerTurn) {
-                state.applyMove(getPlayerMove(scanner, state.getValidMoves()));
+                state.applyMove(getPlayerMove(state));
             } else {
-                System.out.println("AI is thinking...");
-                NimMove bestMove = minimax.getBestMove(state, true);
-                System.out.println("AI plays: " + bestMove);
-                state.applyMove(bestMove);
+                handleAIMove(state);
             }
 
-            playerTurn = !playerTurn;
+            playerTurn = !playerTurn; // Switch player turn
         }
-        
 
-        System.out.println("\nFinal game state:");
-        state.displayGameState();
-        System.out.println(playerTurn ? "You win! AI took the last pip." : "You lose! You took the last pip.");
-        scanner.close();
+        // Final game state and result
+        displayFinalResult(state, playerTurn);
     }
 
-    private static NimMove getPlayerMove(Scanner scanner, List<NimMove> validMoves) {
+    private static NimMove getPlayerMove(NimGameState state) {
+        List<NimMove> validMoves = state.getValidMoves();
         while (true) {
             try {
                 System.out.print("Choose a pile (index): ");
@@ -55,9 +85,31 @@ public class NimGame {
                 if (validMoves.contains(move)) return move;
                 else System.out.println("Invalid move. Try again.");
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter numbers.");
+                System.out.println("Invalid input. Please enter valid numbers.");
             }
         }
+    }
+
+    private static void handleAIMove(NimGameState state) {
+        System.out.println("AI is thinking...");
+        NimMove bestMove = minimax.getBestMove(state, true);
+        System.out.println("AI plays: " + bestMove);
+        state.applyMove(bestMove);
+    }
+
+    private static void displayFinalResult(NimGameState state, boolean playerTurn) {
+        System.out.println("\nFinal game state:");
+        state.displayGameState();
+        if (playerTurn) {
+            System.out.println("You win! AI took the last pip.");
+        } else {
+            System.out.println("You lose! You took the last pip.");
+        }
+    }
+
+    // Ensure the scanner is closed at the end of the game
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> scanner.close()));
     }
 }
 
