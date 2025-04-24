@@ -13,8 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import atmp2.TigerVsDogsMove;
-
 public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public static int TIGER = -3;
     public static int DOG = 1;
@@ -25,7 +23,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     private static int tigerStartPosition = 12;
 
     public boolean tigerTurn;
-    public List<HashSet<Integer>> adjacency;
+    public List<List<Integer>> adjacency;
     public int deadDogs; // whyyyy :c
     public int[] board;
 
@@ -37,7 +35,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
 
         // Initialize adjacency list and board state
         for (int i = 0; i <= 24; i++) {
-            HashSet<Integer> adj = new HashSet<>();
+            List<Integer> adj = new ArrayList<>();
 
             boolean down = false;
             boolean up = false;
@@ -116,10 +114,10 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         lines.add(Arrays.asList(14, 18, 22));
 
         // for (List<Integer> line : lines) {
-        //     for (Integer i : line) {
-        //         System.out.print(i + " ");
-        //     }
-        //     System.out.println();
+        // for (Integer i : line) {
+        // System.out.print(i + " ");
+        // }
+        // System.out.println();
 
         // }
         return lines;
@@ -304,9 +302,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
             if (!dogsToEat.isEmpty()) {
                 diedThisTurn = dogsToEat;
                 eatDogs(dogsToEat); // Eat the dogs
-                System.out.println("onnonononomomonomon");
                 move.setDeadDogs(diedThisTurn);
-                System.out.println(move.getDeadDogs());
             }
         }
     }
@@ -314,9 +310,8 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public void undoMove(TigerVsDogsMove move) {
         swap(move.startNode, move.endNode);
         List<Integer> dead = move.getDeadDogs();
-        if (move.getDeadDogs() !=null){
-            for (Integer dogPos: dead){
-                System.out.println(dogPos);
+        if (move.getDeadDogs() != null) {
+            for (Integer dogPos : dead) {
                 board[dogPos] = DOG;
 
             }
@@ -342,7 +337,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         return adjacency.get(nodeIndex1).contains(nodeIndex2);
     }
 
-    public HashSet<Integer> getAdjacent(Integer nodeIndex) {
+    public List<Integer> getAdjacent(Integer nodeIndex) {
         return adjacency.get(nodeIndex);
     }
 
@@ -351,6 +346,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     }
 
     public void displayGame() {
+        // don't use this, use the pretty one in TigerVsDogsGame
         for (int i = 0; i < board.length; i++) {
             if (i % 5 == 0) {
                 System.out.println();
@@ -371,6 +367,23 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         Integer temp = board[nodeIndex1];
         board[nodeIndex1] = board[nodeIndex2];
         board[nodeIndex2] = temp;
+    }
+
+    public List<Integer> getValidDirections(int position) throws IllegalArgumentException {
+        // return a list of empty adjacent nodes
+        List<Integer> ret = new ArrayList<>();
+        if (position < 0 | position > 24) {
+            throw new IllegalArgumentException(
+                    "Index out of range. Expected number between 0 and 24 recieved" + position);
+        }
+        List<Integer> adj = adjacency.get(position);
+        for (int i = 0; i < adj.size(); i++) {
+            if (board[adj.get(i)] == 0) {
+                ret.add(i + 1);
+
+            }
+        }
+        return ret;
     }
 
     public static void main(String[] args) {
