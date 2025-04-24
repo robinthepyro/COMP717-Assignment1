@@ -19,7 +19,6 @@ package atmp2;
  */
 
 public interface Move<M extends Move<M>> {
-
     /**
      * @return Move<M> that is a deep copy of current move
      */

@@ -107,9 +107,5 @@ public class NimGame {
         }
     }
 
-    // Ensure the scanner is closed at the end of the game
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> scanner.close()));
-    }
 }
 

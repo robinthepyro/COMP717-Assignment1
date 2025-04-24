@@ -12,6 +12,8 @@ public class NimGameState implements GameState<NimMove> {
     // TODO refactor this shitty code
     private static int AI_PLAYER = 1;
     private static int HUMAN_PLAYER = 2;
+    private static int[] defaultGameState = {1,3,5,7,5,3,1};
+    // private static int[] defaultGameState = {10,10,10,10,10,10};
 
     // yes yes, the multiple constructors are goofy, no I don't feel like changing it
     public NimGameState(int[] initialPiles, int player) {
@@ -24,11 +26,11 @@ public class NimGameState implements GameState<NimMove> {
     }
 
     public NimGameState() {
-        this(new int[]{1,3,5,7,5,3,1}, AI_PLAYER);
+        this(defaultGameState, AI_PLAYER);
     }
 
     public NimGameState(boolean humanStarts) {
-        this(new int[]{1,3,5,7,5,3,1}, humanStarts ? HUMAN_PLAYER : AI_PLAYER);
+        this(defaultGameState, humanStarts ? HUMAN_PLAYER : AI_PLAYER);
     }
 
 	public int getPlayer() {
