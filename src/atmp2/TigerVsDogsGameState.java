@@ -9,8 +9,9 @@
 package atmp2;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 
 public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
@@ -19,8 +20,9 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public static int EMPTY = 0;
     public List<Integer> diedThisTurn;
 
-    private static int[] dogStartPostions = { 0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24 };
-    private static int tigerStartPosition = 12;
+    private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24 };
+    // private static final int[] dogStartPositions = {6,7,8,11,13,16,17,18,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    private static final int tigerStartPosition = 12;
 
     public boolean tigerTurn;
     public List<List<Integer>> adjacency;
@@ -32,6 +34,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         this.board = new int[25];
         this.tigerTurn = true;
         this.diedThisTurn = new ArrayList<>();
+        this.deadDogs = 0;
 
         // Initialize adjacency list and board state
         for (int i = 0; i <= 24; i++) {
@@ -79,7 +82,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         // Initialize the game board
         int j = 0;
         for (int i = 0; i < board.length; i++) {
-            if (i == dogStartPostions[j]) {
+            if (i == dogStartPositions[j]) {
                 board[i] = DOG; // Dog
                 j++;
             } else if (i == tigerStartPosition) {
@@ -88,6 +91,47 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         }
     }
 
+    // TODO this is a lot of duplicated code from canEat()
+    // should probs remove canEat() as that is kinda dumb
+    public List<Integer> getDogsToEat(Integer position) {
+        List<Integer> ret = new ArrayList<>();
+        List<List<Integer>> lines = getLines();
+        List<Integer> target = Arrays.asList(EMPTY, DOG, TIGER, DOG, EMPTY);
+        for (List<Integer> line : lines) {
+            if (line.contains(position)) {
+                List<Integer> expandedLine = new ArrayList<>();
+                expandedLine.add(EMPTY);
+                for (Integer space : line) {
+                    if (space == position) {
+                        expandedLine.add(TIGER);
+
+                    } else if (board[space] == TIGER) {
+                        expandedLine.add(EMPTY);
+                    }
+
+                    else {
+                        expandedLine.add(board[space]);
+
+                    }
+
+                }
+                expandedLine.add(EMPTY);
+                int start = Collections.indexOfSubList(expandedLine, target);
+                if (start != -1) {
+                    System.out.println("check");
+                    for (int i = start; i < target.size() - 2; i++) {
+                        if (board[line.get(i)] == DOG) {
+                            ret.add(line.get(i));
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    // TODO fix this hardcoded garbage?
+    // low priority but this is ugly
     public List<List<Integer>> getLines() {
         List<List<Integer>> lines = new ArrayList<>();
 
@@ -113,58 +157,36 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         lines.add(Arrays.asList(2, 6, 10));
         lines.add(Arrays.asList(14, 18, 22));
 
-        // for (List<Integer> line : lines) {
-        // for (Integer i : line) {
-        // System.out.print(i + " ");
-        // }
-        // System.out.println();
-
-        // }
         return lines;
     }
 
-    public void eatDogs(List<Integer> dogs) {
-        // Remove the dogs from the board
-        for (Integer dogPos : dogs) {
-            board[dogPos] = 0; // 0 represents an empty space
-            deadDogs++;
-        }
-
-        // Display updated board
-        // System.out.println("Tiger eats dogs! Updated board:");
-        // displayGame();
-    }
-
-    public boolean canTigerEatDogs() {
-        Integer tigerPos = getTigerPosition();
+    public boolean canEat(int position) {
         List<List<Integer>> lines = getLines(); // Method to get all valid lines (straight or diagonal)
-
+        List<Integer> target = Arrays.asList(EMPTY, DOG, TIGER, DOG, EMPTY);
         for (List<Integer> line : lines) {
-            List<Integer> dogsOnLine = new ArrayList<>();
+            if (line.contains(position)) {
+                List<Integer> expandedLine = new ArrayList<>();
+                expandedLine.add(EMPTY);
+                for (Integer space : line) {
+                    if (space == position) {
+                        expandedLine.add(TIGER);
 
-            // Collect dogs on this line
-            for (Integer pos : line) {
-                if (board[pos] == DOG) { // A dog is on this position
-                    dogsOnLine.add(pos);
-                }
-            }
-
-            // If there are exactly two dogs on the line, check if the tiger can eat them
-            if (dogsOnLine.size() == 2) {
-                Integer dog1 = dogsOnLine.get(0);
-                Integer dog2 = dogsOnLine.get(1);
-
-                // Check if the tiger is adjacent to both dogs
-                if (isAdjacent(tigerPos, dog1) && isAdjacent(tigerPos, dog2)) {
-                    // Check if the dogs are not adjacent to each other
-                    if (!isAdjacent(dog1, dog2)) {
-                        // The tiger can eat these two dogs
-                        return true;
+                    } else if (board[space] == TIGER) {
+                        expandedLine.add(EMPTY);
                     }
+
+                    else {
+                        expandedLine.add(board[space]);
+
+                    }
+
+                }
+                expandedLine.add(EMPTY);
+                if (Collections.indexOfSubList(expandedLine, target) != -1) {
+                    return true;
                 }
             }
         }
-
         return false;
     }
 
@@ -173,11 +195,14 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     }
 
     public boolean isTerminal() {
-        if (tigerTurn) {
-            return deadDogs == 6;
-        } else {
-            return tigerHasValidMoves();
+        if ( deadDogs >= 6){
+            return true;
         }
+        if (getEmptyNeighbours(getTigerPosition()).size() == 0){
+            return true;
+            
+        }
+        return false;
     }
 
     private boolean tigerHasValidMoves() {
@@ -191,7 +216,13 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
 
     public int evaluate() {
         if (isTerminal()) {
-            return tigerTurn ? 1 : -1;
+            if ( deadDogs >= 6){
+                return 1;
+            }
+            if (getEmptyNeighbours(getTigerPosition()).size() == 0){
+                return -1;
+            
+            }
         }
         return 0;
     }
@@ -220,39 +251,6 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         return ret;
     }
 
-    public List<Integer> getDiedThisTurn(TigerVsDogsMove move) {
-        swap(move.startNode, move.endNode);
-        List<Integer> deadThisTurn = new ArrayList<>();
-        // After applying the move, check if the tiger can eat any dogs
-        if (!tigerTurn && canTigerEatDogs()) {
-            List<Integer> dogsToEat = new ArrayList<>();
-            Integer tigerPos = getTigerPosition();
-
-            // Check which dogs are on the same line as the tiger
-            for (List<Integer> line : getLines()) {
-                if (line.contains(tigerPos)) {
-                    List<Integer> dogsOnLine = new ArrayList<>();
-                    for (Integer pos : line) {
-                        if (board[pos] == DOG) {
-                            dogsOnLine.add(pos);
-                        }
-                    }
-
-                    // If exactly two dogs are on this line, eat them
-                    if (dogsOnLine.size() == 2 && isAdjacent(tigerPos, dogsOnLine.get(0))
-                            && isAdjacent(tigerPos, dogsOnLine.get(1))) {
-                        if (!isAdjacent(dogsOnLine.get(0), dogsOnLine.get(1))) {
-                            deadThisTurn = dogsOnLine;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        swap(move.startNode, move.endNode);
-        return deadThisTurn;
-
-    }
 
     public List<TigerVsDogsMove> getOptimisedValidMoves() {
         return getValidMoves();
@@ -267,43 +265,37 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         throw new IllegalStateException("We lost the Tiger :o");
     }
 
+    // nb this will modify the move passed in if it kills
+    // we store the deaths inside the moves to allow easy undoing for minimaxing
+    // Doing it another way would be great, but we're running out of time and this
+    // was the fastest way to implement this.
     @Override
     public void applyMove(TigerVsDogsMove move) {
-        diedThisTurn = new ArrayList<>(); // reset deaths every turn
-        swap(move.startNode, move.endNode);
-        tigerTurn = !tigerTurn;
+        // TODO this if statement is dumb, refactor please robin <3 xoxo
+        if (tigerTurn) {
+            if (canEat(move.endNode)) {
+                List<Integer> eaten = getDogsToEat(move.endNode);
+                move.setDeadDogs(eaten);
+                for (Integer dogPos : eaten) {
+                    board[dogPos] = EMPTY;
+                    deadDogs++;
+                }
 
-        // After applying the move, check if the tiger can eat any dogs
-        if (!tigerTurn && canTigerEatDogs()) {
-            List<Integer> dogsToEat = new ArrayList<>();
-            Integer tigerPos = getTigerPosition();
-
-            // Check which dogs are on the same line as the tiger
-            for (List<Integer> line : getLines()) {
-                if (line.contains(tigerPos)) {
-                    List<Integer> dogsOnLine = new ArrayList<>();
-                    for (Integer pos : line) {
-                        if (board[pos] == DOG) {
-                            dogsOnLine.add(pos);
-                        }
-                    }
-
-                    // If exactly two dogs are on this line, eat them
-                    if (dogsOnLine.size() == 2 && isAdjacent(tigerPos, dogsOnLine.get(0))
-                            && isAdjacent(tigerPos, dogsOnLine.get(1))) {
-                        if (!isAdjacent(dogsOnLine.get(0), dogsOnLine.get(1))) {
-                            dogsToEat = dogsOnLine;
-                            break;
-                        }
-                    }
+            }
+            swap(move.startNode, move.endNode);
+            tigerTurn = !tigerTurn;
+        }
+        else{
+            swap(move.startNode, move.endNode);
+            if (canEat(getTigerPosition())){
+                List<Integer> eaten = getDogsToEat(move.endNode);
+                move.setDeadDogs(eaten);
+                for (Integer dogPos : eaten) {
+                    deadDogs++;
+                    board[dogPos] = EMPTY;
                 }
             }
-
-            if (!dogsToEat.isEmpty()) {
-                diedThisTurn = dogsToEat;
-                eatDogs(dogsToEat); // Eat the dogs
-                move.setDeadDogs(diedThisTurn);
-            }
+            tigerTurn = !tigerTurn;
         }
     }
 
@@ -313,21 +305,22 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         if (move.getDeadDogs() != null) {
             for (Integer dogPos : dead) {
                 board[dogPos] = DOG;
-
+                deadDogs--;
             }
         }
         tigerTurn = !tigerTurn;
     }
 
+    // stupid garbahe debug method, don't use this
     public String printBoard() {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < board.length; i++) {
             if (i % 5 == 0) {
-                ret = ret + "\n";
+                ret.append("\n");
             }
-            ret = ret + board[i];
+            ret.append(board[i]);
         }
-        return ret;
+        return ret.toString();
     }
 
     public boolean isAdjacent(Integer nodeIndex1, Integer nodeIndex2) {
@@ -364,28 +357,48 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     }
 
     private void swap(Integer nodeIndex1, Integer nodeIndex2) {
-        Integer temp = board[nodeIndex1];
+        int temp = board[nodeIndex1];
         board[nodeIndex1] = board[nodeIndex2];
         board[nodeIndex2] = temp;
     }
 
-    public List<Integer> getValidDirections(int position) throws IllegalArgumentException {
+    public List<Integer> getEmptyNeighbours(int position) throws IllegalArgumentException {
         // return a list of empty adjacent nodes
+        //
+        // because the order in which the adjacency list is filled is really
+        // inconvienient and we don't need this method to be highly performant (it's run
+        // once
+        // each human turn) I'm going to do this a suboptimal, but more readable way.
+        //
+        // This does rely on some ugly try catch shenanigans. I don't care.
+        //
+        Map<Integer, Integer> directionOffsets = Map.of(
+                1, -6,
+                2, -5,
+                3, -4,
+                4, -1,
+                5, +1,
+                6, +4,
+                7, +5,
+                8, +6);
         List<Integer> ret = new ArrayList<>();
-        if (position < 0 | position > 24) {
-            throw new IllegalArgumentException(
-                    "Index out of range. Expected number between 0 and 24 recieved" + position);
-        }
-        List<Integer> adj = adjacency.get(position);
-        for (int i = 0; i < adj.size(); i++) {
-            if (board[adj.get(i)] == 0) {
-                ret.add(i + 1);
 
+        // this loop is ugly as hell, just iterate the map keys dumbass
+        for (int i = 1; i < 9; i++) {
+            try {
+                int newPosition = position + directionOffsets.get(i);
+                if (board[newPosition] == 0 & getAdjacent(position).contains(newPosition)) {
+                    ret.add(i);
+                }
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+                continue;
             }
         }
         return ret;
     }
 
+    // testing
     public static void main(String[] args) {
         TigerVsDogsGameState g = new TigerVsDogsGameState();
         g.getLines();

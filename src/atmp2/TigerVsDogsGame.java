@@ -8,41 +8,46 @@ import java.util.Scanner;
 
 import atmp2.TigerVsDogsMove;
 
+
 public class TigerVsDogsGame {
     TigerVsDogsGameState state;
     Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax;
+    private static Random rand = new Random();
 
     TigerVsDogsGame() {
         this.state = new TigerVsDogsGameState();
         this.minimax = new Minimax<>(8);
     }
 
+    public TigerVsDogsMove getAIMove(){
+        return state.getOptimisedValidMoves().get(rand.nextInt(state.getOptimisedValidMoves().size()));
+    }
+
     public void run() {
-        // gameloop
         TigerVsDogsMove move;
         while (true) {
             displayGame(state);
-            move = pickTigerMove();
+            move = getTigerMove();
             state.applyMove(move);
             if (state.isTerminal()){
                 System.out.println("Game Over Tiger wins");
+
+                break;
             }
             displayGame(state);
-            move = minimax.getBestMove(state, true);
+            // move = minimax.getBestMove(state, true);
+            move = getAIMove();
             state.applyMove(move);
             if (state.isTerminal()){
                 System.out.println("Game Over Dogs win");
+                break;
             }
-
-            // check terminal
-            // dog turn
-            // check terminal
-        // }
-        // declare winner
+        }
+        displayGame(state);
     }
 
+    // not gonna sugarcoat it. This is hideous
     public static void displayGame(TigerVsDogsGameState state) {
-
         char[] displayChars = new char[state.board.length];
         for (int i = 0; i < displayChars.length; i++) {
             // System.out.println(state.board[i]);
@@ -62,6 +67,7 @@ public class TigerVsDogsGame {
                 }
             }
         }
+        System.out.println("Dogs Eaten: " + state.deadDogs);
         System.out.printf("""
                 ╭───╮   ╭───╮   ╭───╮   ╭───╮   ╭───╮
                 │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
@@ -117,12 +123,8 @@ public class TigerVsDogsGame {
 
     // method to get move if human is playing tiger
     public TigerVsDogsMove getTigerMove() {
-        return new TigerVsDogsMove(0, 0);
-    }
-
-    public TigerVsDogsMove pickTigerMove() {
         Scanner scanner = new Scanner(System.in);
-        List<Integer> validDirections = state.getValidDirections(state.getTigerPosition());
+        List<Integer> validDirections = state.getEmptyNeighbours(state.getTigerPosition());
         int startPos = state.getTigerPosition();
 
         Map<Integer, String> directionNames = Map.of(
@@ -197,5 +199,8 @@ public class TigerVsDogsGame {
             }
         }
     }
-
+    public static void main(String[] args){
+        TigerVsDogsGame game  = new TigerVsDogsGame();
+        game.run();
+    }
 }
