@@ -1,55 +1,57 @@
 package atmp2;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import atmp2.Coordinate;
+
+import java.util.ArrayList;
+
 public class TigerVsDogsMove implements Move<TigerVsDogsMove> {
-    public final Integer startNode;
-    public final Integer endNode;
+    public final Coord startNode;
+    public final Coord endNode;
+    public List<Coord> deadDogs; // List of dead dogs during this move
 
-    private List<Integer> deadDogs;
-
-    public TigerVsDogsMove(Integer startNode, Integer endNode) {
+    public TigerVsDogsMove(Coord startNode, Coord endNode) {
         this.startNode = startNode;
         this.endNode = endNode;
-        this.deadDogs = null; // No dogs killed by default
+        this.deadDogs = new ArrayList<>();
     }
 
-    public List<Integer> getDeadDogs() {
+    public Coord getStartNode() {
+        return startNode;
+    }
+
+    public Coord getEndNode() {
+        return endNode;
+    }
+
+    public List<Coord> getDeadDogs() {
         return deadDogs;
     }
 
-    public void setDeadDogs(List<Integer> deadDogs) {
+    public void setDeadDogs(List<Coord> deadDogs) {
         this.deadDogs = deadDogs;
     }
 
     @Override
     public TigerVsDogsMove clone() {
-        TigerVsDogsMove clonedMove = new TigerVsDogsMove(startNode, endNode);
-        if (this.deadDogs != null) {
-            clonedMove.setDeadDogs(new ArrayList<>(this.deadDogs)); // Deep clone of the list
-        }
+        // Return a new TigerVsDogsMove with the same startNode, endNode, and deadDogs list
+        TigerVsDogsMove clonedMove = new TigerVsDogsMove(this.startNode, this.endNode);
+        clonedMove.setDeadDogs(new ArrayList<>(this.deadDogs)); // Create a new list for deadDogs
         return clonedMove;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        TigerVsDogsMove other = (TigerVsDogsMove) o;
-        return startNode.equals(other.startNode) && endNode.equals(other.endNode)
-                && (deadDogs != null ? deadDogs.equals(other.deadDogs) : other.deadDogs == null);
+    public Integer sortBy() {
+        return deadDogs.size(); // Sort by the number of dead dogs (more captured dogs is a better move)
     }
 
     @Override
     public String toString() {
-        String deadDogsString = (deadDogs != null && !deadDogs.isEmpty()) ? " Dead Dogs: " + deadDogs : "";
-        return "Start: " + startNode + " End: " + endNode + deadDogsString;
-    }
-
-    public Integer sortBy() {
-        return endNode;
+        return "Move{" +
+                "start=" + startNode +
+                ", end=" + endNode +
+                ", deadDogs=" + deadDogs +
+                '}';
     }
 }
