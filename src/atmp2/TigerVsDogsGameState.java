@@ -120,6 +120,8 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
                 int start = Collections.indexOfSubList(expandedLine, target);
                 if (start != -1) {
                     System.out.println("line =" + line);
+                    System.out.println("expandedline =" + expandedLine);
+
                     ret.add(line.get(start));
                     ret.add(line.get(start + 2));
 
@@ -216,14 +218,14 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public int evaluate() {
         if (isTerminal()) {
             if (deadDogs >= 6) {
-                return 1;
+                return 100;
             }
             if (getEmptyNeighbours(getTigerPosition()).size() == 0) {
-                return -1;
+                return -100;
 
             }
         }
-        return 0;
+        return deadDogs;
     }
 
     public List<TigerVsDogsMove> getValidMoves() {
@@ -277,8 +279,8 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
                 board[dogPos] = EMPTY;
                 deadDogs++;
             }
-            
         }
+        tigerTurn = !tigerTurn;
     }
 
     public void undoMove(TigerVsDogsMove move) {

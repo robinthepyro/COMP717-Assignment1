@@ -13,15 +13,15 @@ public class TigerVsDogsGame {
     TigerVsDogsGameState state;
     Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax;
     private static final Map<Integer, Integer> directionOffsets = Map.of(
-            1, -6,  // up-left
-            2, -5,  // up
-            3, -4,  // up-right
-            4, -1,  // left
-            5, +1,  // right
-            6, +4,  // down-left
-            7, +5,  // down
-            8, +6   // down-right
-            );
+            1, -6, // up-left
+            2, -5, // up
+            3, -4, // up-right
+            4, -1, // left
+            5, +1, // right
+            6, +4, // down-left
+            7, +5, // down
+            8, +6 // down-right
+    );
     private static Random rand = new Random();
 
     TigerVsDogsGame() {
@@ -36,9 +36,6 @@ public class TigerVsDogsGame {
     public static TigerVsDogsMove getDogTurn(TigerVsDogsGameState state) {
         Scanner scanner = new Scanner(System.in);
         int[] board = state.board;
-
-        // Show board with dog IDs
-        // displayGameWithDogIDs(state);
 
         int startNode;
         while (true) {
@@ -60,27 +57,46 @@ public class TigerVsDogsGame {
             return getDogTurn(state);
         }
 
-        System.out.println("\nAvailable directions for dog at " + startNode + ":");
-        for (int dir : validDirections) {
-            System.out.println("  " + dir + " → " + directionName(dir));
-        }
+        int chosenDirection = pickDirection(validDirections, "dog at " + startNode);
+        int endNode = startNode + directionOffsets.get(chosenDirection);
+        return new TigerVsDogsMove(startNode, endNode);
+    }
 
-        int chosenDirection;
-        while (true) {
-            System.out.print("Enter direction number: ");
-            try {
-                chosenDirection = scanner.nextInt();
-                if (validDirections.contains(chosenDirection))
-                    break;
-                System.out.println("❌ That’s not a valid direction from here.");
-            } catch (InputMismatchException e) {
-                System.out.println("❌ Invalid input. Please enter a number.");
-                scanner.nextLine(); // Clear invalid input
+    public static int pickDirection(List<Integer> validDirections, String pieceDescription) {
+        Scanner scanner = new Scanner(System.in);
+
+        Map<Character, Integer> directionKeyMap = Map.of(
+                'Q', 1, 'W', 2, 'E', 3,
+                'A', 4, 'D', 5,
+                'Z', 6, 'S', 7, 'C', 8);
+
+        Map<Integer, String> directionNames = Map.of(
+                1, "Up-Left", 2, "Up", 3, "Up-Right",
+                4, "Left", 5, "Right",
+                6, "Down-Left", 7, "Down", 8, "Down-Right");
+
+        System.out.println("\nAvailable directions for " + pieceDescription + ":");
+        for (Map.Entry<Character, Integer> entry : directionKeyMap.entrySet()) {
+            int dir = entry.getValue();
+            if (validDirections.contains(dir)) {
+                System.out.printf("  %c → %s%n", entry.getKey(), directionNames.get(dir));
             }
         }
 
-        int endNode = startNode + directionOffsets.get(chosenDirection);
-        return new TigerVsDogsMove(startNode, endNode);
+        while (true) {
+            System.out.print("Enter your direction key (QWEASDZC): ");
+            String input = scanner.nextLine().trim().toUpperCase();
+            if (input.length() == 1 && directionKeyMap.containsKey(input.charAt(0))) {
+                int chosenDirection = directionKeyMap.get(input.charAt(0));
+                if (validDirections.contains(chosenDirection)) {
+                    return chosenDirection;
+                } else {
+                    System.out.println("❌ That direction is not valid from this position.");
+                }
+            } else {
+                System.out.println("❌ Invalid input. Please use one of QWEASDZC.");
+            }
+        }
     }
 
     private static boolean isDogAlive(int index, int[] board) {
@@ -97,35 +113,35 @@ public class TigerVsDogsGame {
             case 6 -> "down-left";
             case 7 -> "down";
             case 8 -> "down-right";
-            default -> "unknown";
+            default -> "ayo????";
         };
     }
-
 
     public void run() {
         TigerVsDogsMove move;
         Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax = new Minimax<>(1);
-        while(true){
+        while (true) {
             displayGameWithDogIDs(state);
+            System.out.println(state.getValidMoves());
             state.applyMove(minimax.getBestMove(state, true));
-            if (state.isTerminal()){
+            if (state.isTerminal()) {
                 System.out.println("Game Over");
                 break;
             }
             displayGameWithDogIDs(state);
             state.applyMove(getDogTurn(state));
-            if (state.isTerminal()){
+            if (state.isTerminal()) {
                 System.out.println("Game Over");
                 break;
             }
         }
-        state.applyMove(getDogTurn(state));
-        System.out.println("The winner is " +state.evaluate());
+        displayGameWithDogIDs(state);
+        System.out.println("The winner is " + state.evaluate());
     }
 
     // not gonna sugarcoat it. This is hideous
     // TODO realise that all these todo messages are going to stay in the codebase
-    // forever
+    // forever. These are never going away.
     public static void displayGame(TigerVsDogsGameState state) {
         char[] displayChars = new char[state.board.length];
         for (int i = 0; i < displayChars.length; i++) {
@@ -244,52 +260,14 @@ public class TigerVsDogsGame {
 
     // method to get move if human is playing tiger
     public TigerVsDogsMove getTigerMove() {
-        Scanner scanner = new Scanner(System.in);
-        List<Integer> validDirections = state.getEmptyNeighbours(state.getTigerPosition());
         int startPos = state.getTigerPosition();
+        List<Integer> validDirections = state.getEmptyNeighbours(startPos);
 
-        Map<Integer, String> directionNames = Map.of(
-                1, "Up-Left", // -6
-                2, "Up", // -5
-                3, "Up-Right", // -4
-                4, "Left", // -1
-                5, "Right", // +1
-                6, "Down-Left", // +4
-                7, "Down", // +5
-                8, "Down-Right" // +6
-        );
+        int chosenDirection = pickDirection(validDirections, "tiger at " + startPos);
+        int offset = directionOffsets.get(chosenDirection);
+        int endPos = startPos + offset;
 
-        Map<Integer, Integer> directionOffsets = Map.of(
-                1, -6,
-                2, -5,
-                3, -4,
-                4, -1,
-                5, +1,
-                6, +4,
-                7, +5,
-                8, +6);
-
-        for (int dir : validDirections) {
-            System.out.printf("%d: %s%n", dir, directionNames.get(dir));
-        }
-
-        while (true) {
-            System.out.print("Enter the number of your chosen direction: ");
-            String input = scanner.nextLine().trim();
-
-            try {
-                int chosenDirection = Integer.parseInt(input);
-                if (validDirections.contains(chosenDirection)) {
-                    int offset = directionOffsets.get(chosenDirection);
-                    int endPos = startPos + offset;
-                    return new TigerVsDogsMove(startPos, endPos);
-                } else {
-                    System.out.println("That direction is not valid. Please choose from the list above.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number corresponding to a direction.");
-            }
-        }
+        return new TigerVsDogsMove(startPos, endPos);
     }
 
     private boolean humanStarts() {
