@@ -10,31 +10,30 @@ import atmp2.TigerVsDogsMove;
 public class TestTiger {
     public static void main(String[] args) {
         TigerVsDogsGame game = new TigerVsDogsGame();
+        Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax = new Minimax<>(8);
 
         // test get validmoves
         
-        // test apply / undo
-        TigerVsDogsMove move1 = new TigerVsDogsMove(12, 11);
-        TigerVsDogsMove move2 = new TigerVsDogsMove(0, 6);
-        TigerVsDogsMove move3 = new TigerVsDogsMove(1, 7);
-        TigerVsDogsMove move4 = new TigerVsDogsMove(11, 12);
-        TigerVsDogsMove move5 = new TigerVsDogsMove(6, 11);
-        TigerVsDogsMove move6 = new TigerVsDogsMove(12, 6);
-        game.state.applyMove(move1);
-        game.displayGame(game.state);
-        game.state.applyMove(move2);
-        game.displayGame(game.state);
-        game.state.applyMove(move3);
-        game.displayGame(game.state);
-        game.state.applyMove(move4);
-        game.displayGame(game.state);
-        game.state.applyMove(move5);
-        game.displayGame(game.state);
-        game.state.applyMove(move6);
-        game.displayGame(game.state);
-        // test evaluate
-        // System.out.println(game.state.evaluate());
-        // test isTerminal
+        // test apply / undo        game.getDogTurn(game.state);
+        game.displayGameWithDogIDs(game.state);
+
+        
+         
+        while(true){
+            game.displayGame(game.state);
+            game.state.applyMove(minimax.getBestMove(game.state, true));
+            if (game.state.isTerminal()){
+                System.out.println("Game Over");
+                break;
+            }
+            game.displayGame(game.state);
+            game.state.applyMove(game.getDogTurn(game.state));
+            if (game.state.isTerminal()){
+                System.out.println("Game Over");
+                break;
+            }
+        }
+        System.out.println("The winner is " +game.state.evaluate());
 
     }
 

@@ -20,8 +20,9 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public static int EMPTY = 0;
     public List<Integer> diedThisTurn;
 
-    private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24 };
-    // private static final int[] dogStartPositions = {6,7,8,11,13,16,17,18,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 5, 9, 10, 14,
+    15, 19, 20, 21, 22, 23, 24 };
+    // private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 10, 11, 12, 15,14, 20,20,20,20,20,20};
     private static final int tigerStartPosition = 12;
 
     public boolean tigerTurn;
@@ -113,12 +114,10 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
                         expandedLine.add(board[space]);
 
                     }
-
                 }
                 expandedLine.add(EMPTY);
                 int start = Collections.indexOfSubList(expandedLine, target);
                 if (start != -1) {
-                    System.out.println("check");
                     for (int i = start; i < target.size() - 2; i++) {
                         if (board[line.get(i)] == DOG) {
                             ret.add(line.get(i));
@@ -195,12 +194,12 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     }
 
     public boolean isTerminal() {
-        if ( deadDogs >= 6){
+        if (deadDogs >= 6) {
             return true;
         }
-        if (getEmptyNeighbours(getTigerPosition()).size() == 0){
+        if (getEmptyNeighbours(getTigerPosition()).size() == 0) {
             return true;
-            
+
         }
         return false;
     }
@@ -216,12 +215,12 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
 
     public int evaluate() {
         if (isTerminal()) {
-            if ( deadDogs >= 6){
+            if (deadDogs >= 6) {
                 return 1;
             }
-            if (getEmptyNeighbours(getTigerPosition()).size() == 0){
+            if (getEmptyNeighbours(getTigerPosition()).size() == 0) {
                 return -1;
-            
+
             }
         }
         return 0;
@@ -250,7 +249,6 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
         }
         return ret;
     }
-
 
     public List<TigerVsDogsMove> getOptimisedValidMoves() {
         return getValidMoves();
@@ -284,10 +282,9 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
             }
             swap(move.startNode, move.endNode);
             tigerTurn = !tigerTurn;
-        }
-        else{
+        } else {
             swap(move.startNode, move.endNode);
-            if (canEat(getTigerPosition())){
+            if (canEat(getTigerPosition())) {
                 List<Integer> eaten = getDogsToEat(move.endNode);
                 move.setDeadDogs(eaten);
                 for (Integer dogPos : eaten) {
