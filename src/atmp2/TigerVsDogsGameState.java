@@ -21,8 +21,9 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public List<Integer> diedThisTurn;
 
     private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 5, 9, 10, 14,
-    15, 19, 20, 21, 22, 23, 24 };
-    // private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 10, 11, 12, 15,14, 20,20,20,20,20,20};
+            15, 19, 20, 21, 22, 23, 24 };
+    // private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 10, 11, 12,
+    // 15,14, 20,20,20,20,20,20};
     private static final int tigerStartPosition = 12;
 
     public boolean tigerTurn;
@@ -118,11 +119,10 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
                 expandedLine.add(EMPTY);
                 int start = Collections.indexOfSubList(expandedLine, target);
                 if (start != -1) {
-                    for (int i = start; i < target.size() - 2; i++) {
-                        if (board[line.get(i)] == DOG) {
-                            ret.add(line.get(i));
-                        }
-                    }
+                    System.out.println("line =" + line);
+                    ret.add(line.get(start));
+                    ret.add(line.get(start + 2));
+
                 }
             }
         }
@@ -269,30 +269,15 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     // was the fastest way to implement this.
     @Override
     public void applyMove(TigerVsDogsMove move) {
-        // TODO this if statement is dumb, refactor please robin <3 xoxo
-        if (tigerTurn) {
-            if (canEat(move.endNode)) {
-                List<Integer> eaten = getDogsToEat(move.endNode);
-                move.setDeadDogs(eaten);
-                for (Integer dogPos : eaten) {
-                    board[dogPos] = EMPTY;
-                    deadDogs++;
-                }
-
+        swap(move.startNode, move.endNode);
+        if(canEat(getTigerPosition())){
+            List<Integer> eaten = getDogsToEat(getTigerPosition());
+            move.setDeadDogs(eaten);
+            for (Integer dogPos : eaten) {
+                board[dogPos] = EMPTY;
+                deadDogs++;
             }
-            swap(move.startNode, move.endNode);
-            tigerTurn = !tigerTurn;
-        } else {
-            swap(move.startNode, move.endNode);
-            if (canEat(getTigerPosition())) {
-                List<Integer> eaten = getDogsToEat(move.endNode);
-                move.setDeadDogs(eaten);
-                for (Integer dogPos : eaten) {
-                    deadDogs++;
-                    board[dogPos] = EMPTY;
-                }
-            }
-            tigerTurn = !tigerTurn;
+            
         }
     }
 
@@ -309,7 +294,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     }
 
     // stupid garbahe debug method, don't use this
-    public String printBoard() {
+    public String toString() {
         StringBuilder ret = new StringBuilder();
         for (int i = 0; i < board.length; i++) {
             if (i % 5 == 0) {

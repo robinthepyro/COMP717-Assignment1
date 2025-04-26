@@ -52,14 +52,6 @@ public interface GameState<M extends Move<M>> {
 
 
     
-    /**
-     * @deprecated This method is currently unused in the minimax algorithm. 
-     * The caching of game states was removed, so, this method has been commented out.
-     * It might be re-implemented in the future if transposition tables are reintroduced.
-     * 
-     * @return A unique string representation of the game state.
-     */
-    // String getMemoKey();
 
     
     /**
@@ -69,5 +61,6 @@ public interface GameState<M extends Move<M>> {
      * @return true if the game state is terminal, else false
      */
     @Deprecated
-    boolean isGameOver();}
+    boolean isGameOver();
+   }
 

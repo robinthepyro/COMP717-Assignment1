@@ -38,7 +38,7 @@ public class TigerVsDogsGame {
         int[] board = state.board;
 
         // Show board with dog IDs
-        displayGameWithDogIDs(state);
+        // displayGameWithDogIDs(state);
 
         int startNode;
         while (true) {
@@ -104,25 +104,23 @@ public class TigerVsDogsGame {
 
     public void run() {
         TigerVsDogsMove move;
-        while (true) {
-            displayGame(state);
-            move = getTigerMove();
-            state.applyMove(move);
-            if (state.isTerminal()) {
-                System.out.println("Game Over Tiger wins");
-
+        Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax = new Minimax<>(1);
+        while(true){
+            displayGameWithDogIDs(state);
+            state.applyMove(minimax.getBestMove(state, true));
+            if (state.isTerminal()){
+                System.out.println("Game Over");
                 break;
             }
-            displayGame(state);
-            // move = minimax.getBestMove(state, true);
-            move = getAIMove();
-            state.applyMove(move);
-            if (state.isTerminal()) {
-                System.out.println("Game Over Dogs win");
+            displayGameWithDogIDs(state);
+            state.applyMove(getDogTurn(state));
+            if (state.isTerminal()){
+                System.out.println("Game Over");
                 break;
             }
         }
-        displayGame(state);
+        state.applyMove(getDogTurn(state));
+        System.out.println("The winner is " +state.evaluate());
     }
 
     // not gonna sugarcoat it. This is hideous

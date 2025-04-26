@@ -2,38 +2,25 @@ package atmp2;
 
 import java.util.Random;
 
-import atmp2.Minimax;
-import atmp2.TigerVsDogsGame;
-import atmp2.TigerVsDogsGameState;
-import atmp2.TigerVsDogsMove;
-
 public class TestTiger {
     public static void main(String[] args) {
         TigerVsDogsGame game = new TigerVsDogsGame();
-        Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax = new Minimax<>(8);
+        Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax = new Minimax<>(1);
 
-        // test get validmoves
-        
-        // test apply / undo        game.getDogTurn(game.state);
-        game.displayGameWithDogIDs(game.state);
+        int[] b = {
+                0, 0, 1, 0, 0,
+                0, 0, 0, 0, 0,
+                0, 0, 0, -3, 1,
+                0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0,
+        };
+        game.state.board = b;
+        game.displayGame(game.state);
+        System.out.println(game.state.getDogsToEat(3));
+        game.state.applyMove(new TigerVsDogsMove(13, 8));
 
-        
-         
-        while(true){
-            game.displayGame(game.state);
-            game.state.applyMove(minimax.getBestMove(game.state, true));
-            if (game.state.isTerminal()){
-                System.out.println("Game Over");
-                break;
-            }
-            game.displayGame(game.state);
-            game.state.applyMove(game.getDogTurn(game.state));
-            if (game.state.isTerminal()){
-                System.out.println("Game Over");
-                break;
-            }
-        }
-        System.out.println("The winner is " +game.state.evaluate());
+        game.displayGame(game.state);
+        // game.run();
 
     }
 
