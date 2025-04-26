@@ -8,8 +8,12 @@
 
 package atmp2;
 
+import java.lang.instrument.IllegalClassFormatException;
 import java.util.ArrayList;
 import java.util.Map;
+
+import atmp2.TigerVsDogsMove;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +22,6 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public static int TIGER = -3;
     public static int DOG = 1;
     public static int EMPTY = 0;
-    public List<Integer> diedThisTurn;
 
     private static final int[] dogStartPositions = { 0, 1, 2, 3, 4, 5, 9, 10, 14,
             15, 19, 20, 21, 22, 23, 24 };
@@ -31,11 +34,21 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public int deadDogs; // whyyyy :c
     public int[] board;
 
+    public String getWinner() {
+        if (!isTerminal())
+            return "";
+        // TODO remove the ugly hardcoded 100
+        else if (evaluate() == 100) {
+            return "Tiger";
+        } else {
+            return "Dogs";
+        }
+    }
+
     public TigerVsDogsGameState() {
         this.adjacency = new ArrayList<>();
         this.board = new int[25];
         this.tigerTurn = true;
-        this.diedThisTurn = new ArrayList<>();
         this.deadDogs = 0;
 
         // Initialize adjacency list and board state
@@ -119,9 +132,6 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
                 expandedLine.add(EMPTY);
                 int start = Collections.indexOfSubList(expandedLine, target);
                 if (start != -1) {
-                    System.out.println("line =" + line);
-                    System.out.println("expandedline =" + expandedLine);
-
                     ret.add(line.get(start));
                     ret.add(line.get(start + 2));
 
@@ -249,6 +259,13 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
                 }
             }
         }
+        for (TigerVsDogsMove move : ret){
+            if (board[move.startNode] == board[move.endNode]){
+                throw new IllegalStateException("Fuck You");
+            }
+            System.out.println(move);
+            System.out.println(board[move.startNode] + board[move.endNode]);
+        }
         return ret;
     }
 
@@ -272,7 +289,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     @Override
     public void applyMove(TigerVsDogsMove move) {
         swap(move.startNode, move.endNode);
-        if(canEat(getTigerPosition())){
+        if (canEat(getTigerPosition())) {
             List<Integer> eaten = getDogsToEat(getTigerPosition());
             move.setDeadDogs(eaten);
             for (Integer dogPos : eaten) {
@@ -286,7 +303,8 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     public void undoMove(TigerVsDogsMove move) {
         swap(move.startNode, move.endNode);
         List<Integer> dead = move.getDeadDogs();
-        if (move.getDeadDogs() != null) {
+        if (dead != null){
+        System.out.println(dead);
             for (Integer dogPos : dead) {
                 board[dogPos] = DOG;
                 deadDogs--;
@@ -324,6 +342,7 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
 
     public void displayGame() {
         // don't use this, use the pretty one in TigerVsDogsGame
+        // just here for debugging
         for (int i = 0; i < board.length; i++) {
             if (i % 5 == 0) {
                 System.out.println();
@@ -341,6 +360,9 @@ public class TigerVsDogsGameState implements GameState<TigerVsDogsMove> {
     }
 
     private void swap(Integer nodeIndex1, Integer nodeIndex2) {
+    if (nodeIndex1 == null || nodeIndex2 == null || nodeIndex1 < 0 || nodeIndex1 >= board.length || nodeIndex2 < 0 || nodeIndex2 >= board.length) {
+            throw new IllegalArgumentException("Invalid swap indices: " + nodeIndex1 + ", " + nodeIndex2);
+        }
         int temp = board[nodeIndex1];
         board[nodeIndex1] = board[nodeIndex2];
         board[nodeIndex2] = temp;

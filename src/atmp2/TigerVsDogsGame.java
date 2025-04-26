@@ -1,17 +1,16 @@
 package atmp2;
 
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
+import atmp2.TigerVsDogsGameState;
 import atmp2.TigerVsDogsMove;
 
 public class TigerVsDogsGame {
-    TigerVsDogsGameState state;
-    Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax;
+
     private static final Map<Integer, Integer> directionOffsets = Map.of(
             1, -6, // up-left
             2, -5, // up
@@ -23,15 +22,6 @@ public class TigerVsDogsGame {
             8, +6 // down-right
     );
     private static Random rand = new Random();
-
-    TigerVsDogsGame() {
-        this.state = new TigerVsDogsGameState();
-        this.minimax = new Minimax<>(8);
-    }
-
-    public TigerVsDogsMove getAIMove() {
-        return state.getOptimisedValidMoves().get(rand.nextInt(state.getOptimisedValidMoves().size()));
-    }
 
     public static TigerVsDogsMove getDogTurn(TigerVsDogsGameState state) {
         Scanner scanner = new Scanner(System.in);
@@ -62,7 +52,8 @@ public class TigerVsDogsGame {
         return new TigerVsDogsMove(startNode, endNode);
     }
 
-    public static int pickDirection(List<Integer> validDirections, String pieceDescription) {
+
+	public static int pickDirection(List<Integer> validDirections, String pieceDescription) {
         Scanner scanner = new Scanner(System.in);
 
         Map<Character, Integer> directionKeyMap = Map.of(
@@ -99,47 +90,7 @@ public class TigerVsDogsGame {
         }
     }
 
-    private static boolean isDogAlive(int index, int[] board) {
-        return index >= 0 && index < board.length && board[index] == 1;
-    }
-
-    private static String directionName(int dir) {
-        return switch (dir) {
-            case 1 -> "up-left";
-            case 2 -> "up";
-            case 3 -> "up-right";
-            case 4 -> "left";
-            case 5 -> "right";
-            case 6 -> "down-left";
-            case 7 -> "down";
-            case 8 -> "down-right";
-            default -> "ayo????";
-        };
-    }
-
-    public void run() {
-        TigerVsDogsMove move;
-        Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax = new Minimax<>(1);
-        while (true) {
-            displayGameWithDogIDs(state);
-            System.out.println(state.getValidMoves());
-            state.applyMove(minimax.getBestMove(state, true));
-            if (state.isTerminal()) {
-                System.out.println("Game Over");
-                break;
-            }
-            displayGameWithDogIDs(state);
-            state.applyMove(getDogTurn(state));
-            if (state.isTerminal()) {
-                System.out.println("Game Over");
-                break;
-            }
-        }
-        displayGameWithDogIDs(state);
-        System.out.println("The winner is " + state.evaluate());
-    }
-
-    // not gonna sugarcoat it. This is hideous
+	// not gonna sugarcoat it. This is hideous
     // TODO realise that all these todo messages are going to stay in the codebase
     // forever. These are never going away.
     public static void displayGame(TigerVsDogsGameState state) {
@@ -211,7 +162,7 @@ public class TigerVsDogsGame {
                 displayChars[24]);
     }
 
-    // this is so much dead code holy shit
+	// this is so much dead code holy shit
     public static void displayGameWithDogIDs(TigerVsDogsGameState state) {
         String[] display = new String[state.board.length];
         for (int i = 0; i < state.board.length; i++) {
@@ -246,6 +197,26 @@ public class TigerVsDogsGame {
                 display[15], display[16], display[17], display[18], display[19],
                 display[20], display[21], display[22], display[23], display[24]);
     }
+    public static void main(String[] args) {
+        TigerVsDogsGame game = new TigerVsDogsGame();
+        game.run();
+    }
+    private static boolean isDogAlive(int index, int[] board) {
+        return index >= 0 && index < board.length && board[index] == 1;
+    }
+    private static String directionName(int dir) {
+        return switch (dir) {
+            case 1 -> "up-left";
+            case 2 -> "up";
+            case 3 -> "up-right";
+            case 4 -> "left";
+            case 5 -> "right";
+            case 6 -> "down-left";
+            case 7 -> "down";
+            case 8 -> "down-right";
+            default -> "ayo????";
+        };
+    }
 
     private static String formatCellContent(int index, int[] board) {
         return switch (board[index]) {
@@ -256,7 +227,65 @@ public class TigerVsDogsGame {
         };
     }
 
+    TigerVsDogsGameState state;
+
+    public boolean humanPlaysAsTiger;
+
+
+    Minimax<TigerVsDogsMove, TigerVsDogsGameState> minimax;
+
+    TigerVsDogsGame() {
+        this.state = new TigerVsDogsGameState();
+        this.minimax = new Minimax<>(8);
+    }
+
+    public TigerVsDogsMove getAIMove() {
+        return state.getOptimisedValidMoves().get(rand.nextInt(state.getOptimisedValidMoves().size()));
+    }
+
     // method to get move if human is playing dogs
+
+    public void run() {
+        TigerVsDogsMove move;
+        System.out.println(humanPlaysAsTiger);
+        setupGame();
+        while (true) {
+            if (humanPlaysAsTiger){
+                System.out.println("loop completed");
+                displayGameWithDogIDs(state);
+                state.applyMove(getTigerMove());
+                if(state.isTerminal()){
+                    break;
+                }
+                displayGameWithDogIDs(state);
+                move= minimax.getBestMove(state, true);
+                System.out.println("Ai chose move: " + move);
+                state.applyMove(move);
+                if(state.isTerminal()){
+                    break;
+                }
+            }
+            else{
+                System.out.println("loop completed");
+                displayGameWithDogIDs(state);
+                move= minimax.getBestMove(state, false);
+                System.out.println("Ai chose move: " + move);
+                state.applyMove(move);
+                if(state.isTerminal()){
+                    break;
+                }
+                displayGameWithDogIDs(state);
+                state.applyMove(getDogTurn(state));
+                if(state.isTerminal()){
+                    break;
+                }
+            }
+        }
+        System.out.println("GAME OVER!");
+        displayGame(state);
+        System.out.println(state.getWinner());
+
+    }
 
     // method to get move if human is playing tiger
     public TigerVsDogsMove getTigerMove() {
@@ -269,6 +298,60 @@ public class TigerVsDogsGame {
 
         return new TigerVsDogsMove(startPos, endPos);
     }
+
+public void setupGame() {
+    Scanner scanner = new Scanner(System.in);
+
+    // Choose whether human plays as Tiger, Dog, or Random
+    while (true) {
+        System.out.print("Do you want to play as (T)iger, (D)og, or let the game choose randomly? [T/D/R]: ");
+        String sideInput = scanner.nextLine().trim().toUpperCase();
+
+        switch (sideInput) {
+            case "T":
+                humanPlaysAsTiger = true;
+                System.out.println("You are playing as the Tiger!");
+                break;
+            case "D":
+                humanPlaysAsTiger = false;
+                System.out.println("You are playing as the Dogs!");
+                break;
+            case "R":
+                boolean randomBool = rand.nextBoolean(); 
+                humanPlaysAsTiger = randomBool;
+                System.out.println(randomBool ? "You are playing as the Tiger!" : "You are playing as the Dogs!");
+                break;
+            default:
+                System.out.println("❌ Invalid input. Please enter T for Tiger, D for Dog, or R for Random.");
+                continue; // Ask the question again if the input is invalid
+        }
+
+        // After selecting the side (Tiger/Dog/Random), set the Minimax depth
+        while (true) {
+            System.out.print("Enter the Minimax depth (default is 8): ");
+            String depthInput = scanner.nextLine().trim();
+
+            if (depthInput.isEmpty()) {
+                minimax = new Minimax<>(8);
+                System.out.println("Using default Minimax depth of 8.");
+                return; // Exit the method after setting the depth
+            }
+
+            try {
+                int depth = Integer.parseInt(depthInput);
+                if (depth <= 0) {
+                    System.out.println("❌ Minimax depth must be a positive number. Please try again.");
+                } else {
+                    minimax = new Minimax<>(depth);
+                    System.out.println("Minimax depth set to " + depth + ".");
+                    return; // Exit the method after setting the depth
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a valid integer for depth.");
+            }
+        }
+    }
+}
 
     private boolean humanStarts() {
         Scanner scanner = new Scanner(System.in);
@@ -297,10 +380,5 @@ public class TigerVsDogsGame {
                     System.out.println("Invalid input. Please enter Yes, No, Maybe, or Quit (y/n/m/q).");
             }
         }
-    }
-
-    public static void main(String[] args) {
-        TigerVsDogsGame game = new TigerVsDogsGame();
-        game.run();
     }
 }

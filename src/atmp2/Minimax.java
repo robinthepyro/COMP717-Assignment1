@@ -15,6 +15,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         M bestMove = null;
         int bestScore = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
+        System.out.println(state.getOptimisedValidMoves());
         for (M move : state.getOptimisedValidMoves()) {
             state.applyMove(move);
             int score = minimax(state, 1, !maximizing, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -57,7 +58,8 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
                 beta = Math.min(beta, best);
             }
 
-            if (beta <= alpha) break;
+            if (beta <= alpha)
+                break;
         }
 
         return best;
