@@ -51,6 +51,15 @@ public interface GameState<M extends Move<M>> {
     int evaluate();
 
 
+    /**
+     * @return a deep copy of the state.
+     * adding this to fix some funky shit going on with {@link #undoMove(Move)}
+     *
+     */
+
+    GameState<M> clone();
+
+
     
 
     
