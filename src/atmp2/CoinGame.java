@@ -17,7 +17,7 @@ public class CoinGame {
         int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN :
                 CoinGameState.PLAYER_AI;
 
-        CoinGameState state = new CoinGameState(chosenStartPlayer, 10);
+        CoinGameState state = new CoinGameState(chosenStartPlayer, 20);
 
         int minmaxDepth = getMinMaxDepth();
         minmax = new Minimax<>(minmaxDepth);
