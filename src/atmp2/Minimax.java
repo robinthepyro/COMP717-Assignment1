@@ -1,6 +1,6 @@
 package atmp2;
 
-import java.util.*;
+import java.util.Random;
 
 public class Minimax<M extends Move<M>, S extends GameState<M>> {
     private int maxDepth;
@@ -8,6 +8,19 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
 
     public Minimax(int maxDepth) {
         this.maxDepth = maxDepth;
+    }
+
+    public M getRandomMove(S state) {
+        if (!state.isTerminal()) {
+            Random rand = new Random();
+            int randomIndex = rand.nextInt(state.getValidMoves().size()); // Generates a random index
+            return state.getValidMoves().get(randomIndex);
+        }
+        return null;
+    }
+
+    public M getFirstMove(S state) {
+        return state.getValidMoves().get(0);
     }
 
     public M getBestMove(S state, boolean maximizing) {
@@ -34,12 +47,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         nodesEvaluated++;
 
         if (state.isTerminal() || depth >= maxDepth) {
-            // Use the evaluate function if we've reached max depth but not a terminal state
-            if (state.isTerminal()) {
-                return state.evaluate();
-            } else {
-                return state.evaluate();
-            }
+            return state.evaluate();
         }
 
         int best = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
