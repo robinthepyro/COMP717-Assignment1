@@ -1,6 +1,10 @@
+// TODO! factor out the TicTacToe specific code thats squatting in this class.
 package atmp2;
 
 import java.util.Scanner;
+
+import atmp2.CoinGame;
+import atmp2.TigerRewriteGame;
 
 public class GameSelector {
     private static Scanner scanner = new Scanner(System.in);
@@ -12,15 +16,17 @@ public class GameSelector {
             System.out.println("Choose a game to play:");
             System.out.println("1. Tic Tac Toe");
             System.out.println("2. Nim Game");
-            System.out.println("3. Exit");
+            System.out.println("3. Coin Game");
+            System.out.println("4. Tiger Vs Dogs Game");
+            System.out.println("5. Exit");
 
             int choice = getGameChoice();
 
             switch (choice) {
                 case 1:
                     // Setup for Tic Tac Toe
-                    boolean playerIsX = getPlayerChoice();
-                    int difficulty = getDifficultyLevel();
+                    boolean playerIsX = pickTicTacToePlayerChar();
+                    int difficulty = pickTicTacToeDifficulty();
                     TicTacToeGame ticTacToeGame = new TicTacToeGame(playerIsX, difficulty);
                     ticTacToeGame.run();
                     break;
@@ -30,6 +36,15 @@ public class GameSelector {
                     nimGame.run();
                     break;
                 case 3:
+                    CoinGame coinGame = new CoinGame();
+                    coinGame.run();
+                    break;
+                case 4:
+                    TigerRewriteGame tigerVsDogsGame = new TigerRewriteGame();
+                    tigerVsDogsGame.run();
+                    break;
+
+                case 5:
                     System.out.println("Exiting...");
                     scanner.close();
                     return;  // Exit the program
@@ -40,9 +55,18 @@ public class GameSelector {
         }
     }
 
+    public boolean playAgain(){
+        boolean valid = false;
+        boolean choice = false;
+        while(!valid){
+            
+        }
+    }
+
     private static int getGameChoice() {
         int choice = -1;
-        while (choice < 1 || choice > 3) {
+        // TODO fix this hardcoded garbage?
+        while (choice < 1 || choice > 5) {
             System.out.print("Enter your choice (1, 2, or 3 to Exit): ");
             try {
                 choice = Integer.parseInt(scanner.nextLine());
@@ -53,7 +77,7 @@ public class GameSelector {
         return choice;
     }
 
-    private static boolean getPlayerChoice() {
+    private static boolean pickTicTacToePlayerChar() {
         String input;
         boolean playerIsX = false;
         while (true) {
@@ -72,7 +96,7 @@ public class GameSelector {
         return playerIsX;
     }
 
-    private static int getDifficultyLevel() {
+    private static int pickTicTacToeDifficulty() {
         int difficulty = -1;
         while (difficulty < 1 || difficulty > 10) {
             System.out.print("Enter AI difficulty (1-10): ");

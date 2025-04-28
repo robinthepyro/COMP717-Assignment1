@@ -4,10 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+
+import atmp2.TigerVsDogsMove;
 
 public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
     public int numEaten;
@@ -216,7 +219,23 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
 
     @Override
     public List<TigerVsDogsMove> getOptimisedValidMoves() {
-        return getValidMoves();
+        List<TigerVsDogsMove> ret = getValidMoves();
+        // this is a really ugly hack
+        // what it does is modify the priority of moves based on how many open spaces it leaves
+        // the tiger.
+        // This makes it more likely for good dog moves to be shown to the minimax algo first.
+        // THIS IS VERY IMPORTANT.
+        // Doing this effectively makes it so that when the minimax has insufficient depth to
+        // explore the game tree it can still be likely to pick the best move for dogs.
+        // In a perfect world I would have integrated this functionality into the evaluate
+        // function, but here we are. I don't really want to touch this because it works. 
+        for (TigerVsDogsMove move: ret){
+            applyMove(move);
+            move.setPriority(getEmptyAdjacent(getTigerPos()).size());
+            undoMove(move);
+        }
+        ret.sort(Comparator.comparingInt(TigerVsDogsMove::sortBy));
+        return ret;
     }
 
     private void setNode(Coord coord, int val) {
@@ -272,8 +291,10 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
                 return 100;
             case DOG:
                 return -100;
-            default:
-                return numEaten;
+            default: {
+                return numEaten ;
+                // return 0;
+            }
         }
     }
 
@@ -350,6 +371,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
         }
         setNode(move.startNode, getNode(move.endNode));
         setNode(move.endNode, EMPTY);
+
         tigerTurn = !tigerTurn;
         history.pop();
 

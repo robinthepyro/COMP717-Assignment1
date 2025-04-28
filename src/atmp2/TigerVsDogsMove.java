@@ -5,21 +5,25 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class TigerVsDogsMove implements Move<TigerVsDogsMove> {
-    public static Random rand = new Random();
     public final Coord startNode;
     public final Coord endNode;
     public List<Coord> deadDogs; // List of dead dogs during this move
+    private int priority;
 
     public TigerVsDogsMove(Coord startNode, Coord endNode) {
         this.startNode = startNode;
         this.endNode = endNode;
         this.deadDogs = new ArrayList<>();
+        this.priority = 0;
     }
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
 
     public Coord getStartNode() {
         return startNode;
     }
-
     public Coord getEndNode() {
         return endNode;
     }
@@ -50,7 +54,7 @@ public class TigerVsDogsMove implements Move<TigerVsDogsMove> {
 
     @Override
     public Integer sortBy() {
-        return rand.nextInt();
+        return priority;
 
     }
 

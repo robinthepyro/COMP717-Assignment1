@@ -3,6 +3,9 @@ package atmp2;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Stack;
+
+import atmp2.TigerGameStateRewrite;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -156,8 +159,9 @@ public class TigerRewriteGame {
 
             }
         }
-        // display(state);
+        display(state);
         System.out.println("GAME OVER");
+        System.out.println("The Winner is " + ((state.getWinner() == TigerGameStateRewrite.TIGER) ? "Tiger":"Dogs"));
 
     }
 
