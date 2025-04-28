@@ -28,9 +28,14 @@ public class CoinGameState implements GameState<CoinGameMove> {
         fillBoard();
     }
 
-    private CoinGameState(int[] board, int currentPlayer){
+    private CoinGameState(int[] board, int gameSize, int currentPlayer, int leftPointer, int rightPointer, int playerScore, int aiScore){
         this.board = board;
+        this.gameSize = gameSize;
         this.currentPlayer = currentPlayer;
+        this.leftPointer = leftPointer;
+        this.rightPointer = rightPointer;
+        this.playerScore = playerScore;
+        this.playerScore = aiScore;
     }
 
     public int getCurrentPlayer() {
@@ -159,6 +164,6 @@ public class CoinGameState implements GameState<CoinGameMove> {
 
     @Override
     public CoinGameState clone(){
-        return new CoinGameState(board, currentPlayer);
+        return new CoinGameState(board, gameSize, currentPlayer, leftPointer, rightPointer, playerScore, aiScore);
     }
 }
