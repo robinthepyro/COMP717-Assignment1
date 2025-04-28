@@ -1,7 +1,6 @@
 package atmp2;
 
-import java.nio.channels.IllegalSelectorException;
-import java.util.*;
+import java.util.Random;
 
 public class Minimax<M extends Move<M>, S extends GameState<M>> {
     private int maxDepth;
@@ -12,7 +11,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     }
 
     public M getRandomMove(S state) {
-        if (!state.isTerminal()){
+        if (!state.isTerminal()) {
             Random rand = new Random();
             int randomIndex = rand.nextInt(state.getValidMoves().size()); // Generates a random index
             return state.getValidMoves().get(randomIndex);
@@ -49,12 +48,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         nodesEvaluated++;
 
         if (state.isTerminal() || depth >= maxDepth) {
-            // Use the evaluate function if we've reached max depth but not a terminal state
-            if (state.isTerminal()) {
-                return state.evaluate();
-            } else {
-                return state.evaluate();
-            }
+            return state.evaluate();
         }
 
         int best = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -72,8 +66,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
                 beta = Math.min(beta, best);
             }
 
-            if (beta <= alpha)
-                break;
+            if (beta <= alpha) break;
         }
 
         return best;
