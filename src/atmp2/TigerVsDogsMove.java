@@ -1,12 +1,14 @@
 package atmp2;
 
 import java.util.List;
+import java.util.Random;
 
 import atmp2.Coordinate;
 
 import java.util.ArrayList;
 
 public class TigerVsDogsMove implements Move<TigerVsDogsMove> {
+    public static Random rand = new Random();
     public final Coord startNode;
     public final Coord endNode;
     public List<Coord> deadDogs; // List of dead dogs during this move
@@ -42,8 +44,17 @@ public class TigerVsDogsMove implements Move<TigerVsDogsMove> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TigerVsDogsMove other = (TigerVsDogsMove) o;
+        return startNode == other.startNode && endNode == other.endNode && deadDogs.equals(other.deadDogs);
+    }
+
+    @Override
     public Integer sortBy() {
-        return deadDogs.size(); // Sort by the number of dead dogs (more captured dogs is a better move)
+        return rand.nextInt();
+
     }
 
     @Override

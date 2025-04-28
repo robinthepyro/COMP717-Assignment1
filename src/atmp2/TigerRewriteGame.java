@@ -49,7 +49,16 @@ public class TigerRewriteGame {
 
     public void test() {
         display(state);
-        System.out.println(humanDogMove());
+        TigerVsDogsMove tMove = humanTigerMove();
+        state.applyMove(tMove);
+        display(state);
+        TigerVsDogsMove dMove = humanDogMove();
+        state.applyMove(dMove);
+        display(state);
+        state.undoMove(dMove);
+        display(state);
+
+
     }
 
     public static void display(TigerGameStateRewrite state) {
@@ -120,42 +129,38 @@ public class TigerRewriteGame {
     public void run() {
         while (true) {
             if (humanPlaysAsTiger) {
-                state.display();
+                display(state);
                 TigerVsDogsMove hMove = humanTigerMove();
                 state.applyMove(hMove);
-                state.regenerateStateFromHistory();
                 if (state.isTerminal()) {
                     break;
                 }
 
-                state.display();
+                display(state);
                 TigerVsDogsMove aMove = minimax.getBestMove(state, false);
                 state.applyMove(aMove);
-                state.regenerateStateFromHistory();
                 if (state.isTerminal()) {
                     break;
                 }
             } else {
 
-                state.display();
+                display(state);
                 TigerVsDogsMove aMove = minimax.getBestMove(state, true);
                 state.applyMove(aMove);
-                state.regenerateStateFromHistory();
                 if (state.isTerminal()) {
                     break;
                 }
 
-                state.display();
+                display(state);
                 TigerVsDogsMove hMove = humanDogMove();
                 state.applyMove(hMove);
-                state.regenerateStateFromHistory();
                 if (state.isTerminal()) {
                     break;
                 }
 
             }
         }
-        // state.display();
+        // display(state);
         System.out.println("GAME OVER");
 
     }
@@ -310,7 +315,7 @@ public class TigerRewriteGame {
 
     public static void main(String[] args) {
         TigerRewriteGame g = new TigerRewriteGame();
-        g.test();
+        g.run();
 
     }
 }
