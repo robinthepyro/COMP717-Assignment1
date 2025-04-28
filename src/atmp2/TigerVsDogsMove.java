@@ -2,9 +2,6 @@ package atmp2;
 
 import java.util.List;
 import java.util.Random;
-
-import atmp2.Coordinate;
-
 import java.util.ArrayList;
 
 public class TigerVsDogsMove implements Move<TigerVsDogsMove> {

@@ -28,6 +28,11 @@ public class CoinGameState implements GameState<CoinGameMove> {
         fillBoard();
     }
 
+    private CoinGameState(int[] board, int currentPlayer){
+        this.board = board;
+        this.currentPlayer = currentPlayer;
+    }
+
     public int getCurrentPlayer() {
         return currentPlayer;
     }
@@ -150,5 +155,10 @@ public class CoinGameState implements GameState<CoinGameMove> {
 
         sb.append("]");
         return sb.toString();
+    }
+
+    @Override
+    public CoinGameState clone(){
+        return new CoinGameState(board, currentPlayer);
     }
 }

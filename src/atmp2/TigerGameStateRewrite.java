@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import atmp2.Coord;
-import atmp2.TigerVsDogsMove;
-
 public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
     public int numEaten;
     // TODO history should be be removed for final release

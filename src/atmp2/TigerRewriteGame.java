@@ -9,10 +9,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.naming.directory.DirContext;
-
-import atmp2.TigerGameStateRewrite;
-import atmp2.TigerVsDogsMove;
 
 public class TigerRewriteGame {
     public static Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
