@@ -10,9 +10,9 @@ public class NimGameState implements GameState<NimMove> {
     // ideally this gamestate shouldn't care who is making what moves
     // and should be portable to human vs human games
     // TODO refactor this shitty code
-    private static int AI_PLAYER = 1;
-    private static int HUMAN_PLAYER = 2;
-    private static int[] defaultGameState = {1,3,5,7,5,3,1};
+    private static final int AI_PLAYER = 1;
+    private static final int HUMAN_PLAYER = 2;
+    private static final int[] defaultGameState = {1,3,5,7,5,3,1};
     // private static int[] defaultGameState = {10,10,10,10,10,10};
 
     // yes yes, the multiple constructors are goofy, no I don't feel like changing it
@@ -43,6 +43,10 @@ public class NimGameState implements GameState<NimMove> {
 
     public void switchPlayer(){
         player = (player == AI_PLAYER) ? HUMAN_PLAYER : AI_PLAYER;
+    }
+
+    public NimGameState clone(){
+        return new NimGameState(piles, player);
     }
 
     @Override

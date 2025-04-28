@@ -23,6 +23,10 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         this.movesPlayed = movesPlayed;
     }
 
+    public TicTacToeGameState clone(){
+        return new TicTacToeGameState(board, currentPlayer, movesPlayed);
+    }
+
     private int[][] deepCopyBoard(int[][] original) {
         int[][] copy = new int[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++) {

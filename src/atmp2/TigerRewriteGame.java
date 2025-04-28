@@ -1,6 +1,8 @@
 package atmp2;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Stack;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -8,6 +10,9 @@ import java.util.Scanner;
 import java.util.Set;
 
 import javax.naming.directory.DirContext;
+
+import atmp2.TigerGameStateRewrite;
+import atmp2.TigerVsDogsMove;
 
 public class TigerRewriteGame {
     public static Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
@@ -42,44 +47,146 @@ public class TigerRewriteGame {
 
     }
 
-
-    public void test(){
-
-        System.out.println(minimax.getBestMove(state, false));
+    public void test() {
+        display(state);
+        System.out.println(humanDogMove());
     }
 
+    public static void display(TigerGameStateRewrite state) {
+        List<String> displayStrings = new ArrayList<>();
+        for(int i=0; i< state.board.length ;i++){
+            for (int j=0; j< state.board.length ;j++){
+                displayStrings.add(formatCellContent(i,j,state.board));
+            }
+        }
+
+        System.out.println("Dogs Eaten: " + state.numEaten);
+        System.out.printf("""
+                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
+                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
+                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
+                  |    ＼  |    ／  |    ＼  |    ／  |
+                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
+                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
+                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
+                  |    ／  |    ＼  |    ／  |    ＼  |
+                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
+                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
+                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
+                  |    ＼  |    ／  |    ＼  |    ／  |
+                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
+                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
+                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
+                  |    ／  |    ＼  |    ／  |    ＼  |
+                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
+                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
+                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
+                """,
+                displayStrings.get(0), displayStrings.get(1), displayStrings.get(2), displayStrings.get(3), displayStrings.get(4),
+                displayStrings.get(5), displayStrings.get(6), displayStrings.get(7), displayStrings.get(8), displayStrings.get(9),
+                displayStrings.get(10), displayStrings.get(11), displayStrings.get(12), displayStrings.get(13), displayStrings.get(14),
+                displayStrings.get(15), displayStrings.get(16), displayStrings.get(17), displayStrings.get(18), displayStrings.get(19),
+                displayStrings.get(20), displayStrings.get(21), displayStrings.get(22), displayStrings.get(23), displayStrings.get(24));
+    }
+
+
+    private static String formatCellContent(int firstIndex, int secondIndex, int[][] board) {
+        return switch (board[firstIndex][secondIndex]) {
+            case TigerGameStateRewrite.DOG -> String.format("%2d", firstIndex*5+secondIndex); // Dog with ID (padded)
+            case TigerGameStateRewrite.TIGER -> " T"; // Tiger
+            case TigerGameStateRewrite.EMPTY -> "  "; // Empty
+            default -> "??"; // Unknown
+        };
+    }
+    
+    private static boolean isDogAlive(int index, int[] board) {
+        return index >= 0 && index < board.length && board[index] == 1;
+    }
+    private static String directionName(int dir) {
+        return switch (dir) {
+            case 1 -> "up-left";
+            case 2 -> "up";
+            case 3 -> "up-right";
+            case 4 -> "left";
+            case 5 -> "right";
+            case 6 -> "down-left";
+            case 7 -> "down";
+            case 8 -> "down-right";
+            default -> "ayo????";
+        };
+    }
+    
+
     public void run() {
-        TigerVsDogsMove move;
         while (true) {
-            move = humanTigerMove();
-            state.applyMove(move);
-            System.out.println(state.evaluate());
-            if (state.isTerminal()) {
-                break;
+            if (humanPlaysAsTiger) {
+                state.display();
+                TigerVsDogsMove hMove = humanTigerMove();
+                state.applyMove(hMove);
+                state.regenerateStateFromHistory();
+                if (state.isTerminal()) {
+                    break;
+                }
+
+                state.display();
+                TigerVsDogsMove aMove = minimax.getBestMove(state, false);
+                state.applyMove(aMove);
+                state.regenerateStateFromHistory();
+                if (state.isTerminal()) {
+                    break;
+                }
+            } else {
+
+                state.display();
+                TigerVsDogsMove aMove = minimax.getBestMove(state, true);
+                state.applyMove(aMove);
+                state.regenerateStateFromHistory();
+                if (state.isTerminal()) {
+                    break;
+                }
+
+                state.display();
+                TigerVsDogsMove hMove = humanDogMove();
+                state.applyMove(hMove);
+                state.regenerateStateFromHistory();
+                if (state.isTerminal()) {
+                    break;
+                }
+
             }
-            state.display();
-            move = minimax.getBestMove(state, false);
-            state.applyMove(move);
-            System.out.println(state.evaluate());
-            if (state.isTerminal()) {
-                break;
-            }
-            state.display();
         }
         // state.display();
-        System.out.println(state.numEaten);
         System.out.println("GAME OVER");
 
     }
 
-    private Coord pickDog(){
-        
-        return new Coord(0, 0);
+    // method to let (human) dog player pick a dog to move 
+    private Coord pickDog() {
+        Coord ret = null;
+        while (true) {
+            System.out.print("\nEnter the ID of the dog you want to move: ");
+            int dog;
+            try {
+                 dog = scanner.nextInt();
+                 ret = TigerGameStateRewrite.oneDToTwoD(dog);
+                 if (state.getNode(ret) == TigerGameStateRewrite.DOG)
+                     break;
+                System.out.println("❌ That ID doesn't point to a living dog. Try again.");
+            } catch (InputMismatchException e) {
+                System.out.println("❌ Invalid input. Please enter a number.");
+                scanner.nextLine(); // Clear invalid input
+            }
+        }
+
+
+        return ret;
     }
 
     private TigerVsDogsMove humanDogMove() {
-        TigerVsDogsMove move = state.getOptimisedValidMoves().get(rand.nextInt(state.getOptimisedValidMoves().size()));
-        return move;
+        Coord start = pickDog();
+        Coord direction = pickDirection(getEmptyNeighbourDirections(start));
+        return new TigerVsDogsMove(start, start.add(direction));
+
     }
 
     private int coordPairAsDirection(Coord c1, Coord c2) throws IllegalArgumentException {
@@ -203,7 +310,7 @@ public class TigerRewriteGame {
 
     public static void main(String[] args) {
         TigerRewriteGame g = new TigerRewriteGame();
-        g.run();
+        g.test();
 
     }
 }

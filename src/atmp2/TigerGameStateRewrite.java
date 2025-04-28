@@ -1,5 +1,6 @@
 package atmp2;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,17 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import atmp2.Coord;
+import atmp2.TigerVsDogsMove;
+
 public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
     public int numEaten;
-    private Stack<TigerVsDogsMove> history;
-    private static final int BOARD_SIZE = 5;
-    public int[][] board;
-    Map<Coord, List<Coord>> adj;
+    public Stack<TigerVsDogsMove> history;
     public boolean tigerTurn;
-    public static int TIGER = 9;
-    public static int DOG = 1;
-    public static int EMPTY = 0;
-    private static List<Integer> EATRULE = Arrays.asList(EMPTY, DOG, TIGER, DOG, EMPTY);
+    public int[][] board;
+    private Map<Coord, List<Coord>> adj;
+    private static final int BOARD_SIZE = 5;
+    public static final int TIGER = 9;
+    public static final int DOG = 1;
+    public static final int EMPTY = 0;
+    private static final List<Integer> EAT_PATTERN = Arrays.asList(EMPTY, DOG, TIGER, DOG, EMPTY);
 
     // this is the stupidest shit i have ever done. This should have been a loop but
     // idfc
@@ -65,11 +69,11 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
         this.adj = buildAdjacencyMap(BOARD_SIZE);
         this.numEaten = 0;
         this.board = new int[][] {
-                { DOG, DOG, EMPTY, DOG, DOG },
-                { DOG, EMPTY, DOG, EMPTY, DOG },
+                { DOG, DOG, DOG, DOG, DOG },
+                { DOG, EMPTY, EMPTY, EMPTY, DOG },
                 { DOG, EMPTY, TIGER, EMPTY, DOG },
-                { DOG, DOG, DOG, EMPTY, DOG },
-                { DOG, DOG, EMPTY, DOG, DOG } };
+                { DOG, EMPTY, EMPTY, EMPTY, DOG },
+                { DOG, DOG, DOG, DOG, DOG } };
         this.history = new Stack<>();
         this.tigerTurn = true;
     }
@@ -113,6 +117,18 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
         return adj.getOrDefault(coord, Collections.emptyList());
     }
 
+    // some duplicated code in get valid moves could be replaced with this.
+    public List<Coord> getEmptyAdjacent(Coord coord) {
+        List<Coord> ret = new ArrayList<>();
+        List<Coord> adjacent = getAdjacent(coord);
+        for (Coord c : adjacent) {
+            if (getNode(c) == EMPTY) {
+                ret.add(c);
+            }
+        }
+        return ret;
+    }
+
     public Coord getTigerPos() throws IllegalStateException {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -144,7 +160,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
             for (Coord coord : line) {
                 if (getNode(coord) == TIGER) {
                     List<Integer> extended = extendLine(line);
-                    int start = Collections.indexOfSubList(extended, EATRULE);
+                    int start = Collections.indexOfSubList(extended, EAT_PATTERN);
                     if (start != -1) {
                         ret.add(line[start]);
                         ret.add(line[start + 2]);
@@ -161,7 +177,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
             for (Coord coord : line) {
                 if (getNode(coord) == TIGER) {
                     List<Integer> extended = extendLine(line);
-                    int start = Collections.indexOfSubList(extended, EATRULE);
+                    int start = Collections.indexOfSubList(extended, EAT_PATTERN);
                     if (start != -1) {
                         return true;
                     }
@@ -173,8 +189,10 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
 
     @Override
     public List<TigerVsDogsMove> getValidMoves() {
+        display();
         List<TigerVsDogsMove> ret = new ArrayList<>();
         if (tigerTurn) {
+            display();
             for (Coord a : getAdjacent(getTigerPos())) {
                 if (getNode(a) == EMPTY) {
                     ret.add(new TigerVsDogsMove(getTigerPos(), a));
@@ -207,48 +225,137 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
         board[coord.row][coord.col] = val;
     }
 
-    @Override
-    public void applyMove(TigerVsDogsMove move) {
-
-        int temp = getNode(move.startNode);
-        setNode(move.startNode, 0);
-        setNode(move.endNode, temp);
-        if (canEat()) {
-            move.deadDogs = getEaten();
+    /**
+     * Regenerates the board state from scratch by applying all moves in the history
+     * stack
+     * This ensures the board state and numEaten property are consistent
+     */
+    public void regenerateStateFromHistory() {
+        // Store the current history
+        Stack<TigerVsDogsMove> tempHistory = new Stack<>();
+        while (!history.isEmpty()) {
+            tempHistory.push(history.pop());
         }
 
-        // add to stack
-        history.push(move);
+        // Reset to initial state
+        this.board = new int[][] {
+                { DOG, DOG, DOG, DOG, DOG },
+                { DOG, EMPTY, EMPTY, EMPTY, DOG },
+                { DOG, EMPTY, TIGER, EMPTY, DOG },
+                { DOG, EMPTY, EMPTY, EMPTY, DOG },
+                { DOG, DOG, DOG, DOG, DOG } };
+        this.numEaten = 0;
+        this.tigerTurn = true;
 
-        // Switch turns
+        // Replay moves in correct order (oldest to newest)
+        Stack<TigerVsDogsMove> orderedMoves = new Stack<>();
+        while (!tempHistory.isEmpty()) {
+            orderedMoves.push(tempHistory.pop());
+        }
+
+        while (!orderedMoves.isEmpty()) {
+            TigerVsDogsMove move = orderedMoves.pop();
+            // Special apply move that doesn't add to history
+            applyMoveWithoutHistory(move);
+            // Restore to original history
+            history.push(move);
+        }
+    }
+
+    /**
+     * Applies a move without adding it to the history stack
+     */
+    private void applyMoveWithoutHistory(TigerVsDogsMove move) {
+        int temp = getNode(move.startNode);
+        System.out.println("TEMP == " + temp);
+        display();
+        setNode(move.startNode, 0);
+        setNode(move.endNode, temp);
+        display();
+
+        if (canEat()) {
+            move.deadDogs = getEaten();
+            eat();
+            numEaten += move.deadDogs.size();
+        }
+
+        // Switch turns without adding to history
         tigerTurn = !tigerTurn;
     }
 
-    // i can already feel the incoming jank
-    // we are gonna take in a move param and ignore it.
     @Override
-    public void undoMove(TigerVsDogsMove move) {
-        setNode(move.startNode, getNode(move.endNode));
-        setNode(move.endNode, EMPTY);
+    public void applyMove(TigerVsDogsMove move) {
+        if (move != null) {
+            history.push(move);
+            regenerateStateFromHistory();
+        }
+    }
 
-        if (move.deadDogs != null) {
-            for (Coord c : move.deadDogs) {
-                setNode(c, DOG);
-            }
+    private void eat() {
+        List<Coord> toEat = getEaten();
+        for (Coord d : toEat) {
+            setNode(d, EMPTY);
         }
 
-        history.pop();
-        tigerTurn = !tigerTurn;
+    }
+
+    public boolean equals(TigerGameStateRewrite s) {
+        if (s.tigerTurn != tigerTurn) {
+            System.out.println("tigerturn check failed");
+            return false;
+        }
+        if (!Arrays.deepEquals(s.board, board)) {
+            System.out.println("Board check failed");
+            return false;
+        }
+        if (s.numEaten != numEaten) {
+            System.out.println("numEaten check failed");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void undoMove(TigerVsDogsMove move) {
+        if (move != null) {
+            history.pop();
+            System.out.println("this one\n\n\n\n\\n\n\n\n\n\n\n\n\nn\n\\nn\\n\n\n");
+            display();
+            regenerateStateFromHistory();
+        }
+    }
+
+    public int getWinner() {
+        if (numEaten >= 6)
+            return TIGER;
+        if (tigerTurn && getValidMoves().isEmpty() && !canEat())
+            return DOG;
+        return 0;
     }
 
     @Override
     public boolean isTerminal() {
+        if (numEaten >= 6) {
+            System.out.println("dead dogs >= 6 tiger win");
+            return true;
+
+        }
+        if (getValidMoves().isEmpty())
+            return true;
         return false;
     }
 
     @Override
     public int evaluate() {
-        return numEaten;
+        int val = getWinner();
+        switch (val) {
+            case TIGER:
+                return 100;
+            case DOG:
+                return -100;
+            default:
+                return numEaten;
+        }
     }
 
     @Override
@@ -256,15 +363,50 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
         return isTerminal();
     }
 
+    public void display() {
+        for (int[] row : board) {
+            for (int col : row) {
+                System.out.print(col + " ");
+            }
+            System.out.println();
+        }
+        System.out.println("History: ");
+        System.out.println(history);
+        System.out.println();
+        System.out.println("Dead");
+        System.out.println(numEaten);
+    }
+
     // take int 0-25 return corresponding index into 2d array
-    private Coord oneDToTwoD(int index) {
+    public static Coord oneDToTwoD(int index) {
         int row = index / BOARD_SIZE;
         int col = index % BOARD_SIZE;
         return new Coord(row, col);
 
     }
 
-    private int twoDToOneD(Coord c) {
+    private TigerGameStateRewrite(int[][] board, boolean tigerTurn, Stack<TigerVsDogsMove> history, int numEaten,
+            Map<Coord, List<Coord>> adj) {
+        this.board = board;
+        this.tigerTurn = tigerTurn;
+        this.history = history;
+        this.numEaten = numEaten;
+        this.adj = adj;
+    }
+
+    public TigerGameStateRewrite clone() {
+        int[][] newBoard = new int[BOARD_SIZE][BOARD_SIZE];
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            newBoard[i] = board[i].clone();
+        }
+
+        Stack<TigerVsDogsMove> newHistory = new Stack<>();
+        newHistory.addAll(history); // Assuming TigerVsDogsMove is immutable or clone-safe
+
+        return new TigerGameStateRewrite(newBoard, tigerTurn, newHistory, numEaten, adj);
+    }
+
+    public static int twoDToOneD(Coord c) {
         return c.row * BOARD_SIZE + c.col;
 
     }

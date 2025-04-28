@@ -28,4 +28,10 @@ public class Coord {
     public int hashCode() {
         return 31 * row + col;
     }
+
+    public Coord add(Coord c){
+        int newCol = col + c.col;
+        int newRow = row + c.row;
+        return new Coord(newRow, newCol);
+    }
 }

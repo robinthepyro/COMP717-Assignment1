@@ -1,3 +1,4 @@
+// I THINK THIS IS A DUPLICATE CLASS BUT IM SCARED TO TOUCH IT
 package games.nim;
 import java.util.ArrayList;
 import java.util.Arrays;

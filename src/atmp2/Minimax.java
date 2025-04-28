@@ -1,5 +1,6 @@
 package atmp2;
 
+import java.nio.channels.IllegalSelectorException;
 import java.util.*;
 
 public class Minimax<M extends Move<M>, S extends GameState<M>> {
@@ -11,9 +12,12 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     }
 
     public M getRandomMove(S state) {
-        Random rand = new Random();
-        int randomIndex = rand.nextInt(state.getValidMoves().size()); // Generates a random index
-        return state.getValidMoves().get(randomIndex);
+        if (!state.isTerminal()){
+            Random rand = new Random();
+            int randomIndex = rand.nextInt(state.getValidMoves().size()); // Generates a random index
+            return state.getValidMoves().get(randomIndex);
+        }
+        return null;
     }
 
     public M getFirstMove(S state) {
