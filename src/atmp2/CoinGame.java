@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class CoinGame {
     private final Scanner scanner = new Scanner(System.in);
     private Minimax<CoinGameMove, CoinGameState> minmax;
+    private MemoryTracker memoryTracker = new MemoryTracker();
 
     public void run() {
         System.out.println("Welcome to the Coin Game");
@@ -71,6 +72,8 @@ public class CoinGame {
             System.out.println("You lost...");
         }
         System.out.println("You: " + state.getPlayerScore() + " AI:" + state.getAiScore());
+
+        memoryTracker.printStats();
     }
 
     private CoinGameMove getPlayerMove(CoinGameState state) {
@@ -89,7 +92,9 @@ public class CoinGame {
 
     private void handleAIMove(CoinGameState state) {
         System.out.println("AI is thinking...");
+        memoryTracker.startTracking();
         CoinGameMove bestMove = minmax.getBestMove(state, true);
+        memoryTracker.stopTracking();
         System.out.println("AI plays: " + bestMove);
         state.applyMove(bestMove);
     }
