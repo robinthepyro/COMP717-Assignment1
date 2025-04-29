@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
-
 public class TigerRewriteGame {
     public static Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
     public TigerGameStateRewrite state;
@@ -57,14 +56,13 @@ public class TigerRewriteGame {
         state.undoMove(dMove);
         display(state);
 
-
     }
 
     public static void display(TigerGameStateRewrite state) {
         List<String> displayStrings = new ArrayList<>();
-        for(int i=0; i< state.board.length ;i++){
-            for (int j=0; j< state.board.length ;j++){
-                displayStrings.add(formatCellContent(i,j,state.board));
+        for (int i = 0; i < state.board.length; i++) {
+            for (int j = 0; j < state.board.length; j++) {
+                displayStrings.add(formatCellContent(i, j, state.board));
             }
         }
 
@@ -90,26 +88,32 @@ public class TigerRewriteGame {
                 │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
                 ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
                 """,
-                displayStrings.get(0), displayStrings.get(1), displayStrings.get(2), displayStrings.get(3), displayStrings.get(4),
-                displayStrings.get(5), displayStrings.get(6), displayStrings.get(7), displayStrings.get(8), displayStrings.get(9),
-                displayStrings.get(10), displayStrings.get(11), displayStrings.get(12), displayStrings.get(13), displayStrings.get(14),
-                displayStrings.get(15), displayStrings.get(16), displayStrings.get(17), displayStrings.get(18), displayStrings.get(19),
-                displayStrings.get(20), displayStrings.get(21), displayStrings.get(22), displayStrings.get(23), displayStrings.get(24));
+                displayStrings.get(0), displayStrings.get(1), displayStrings.get(2), displayStrings.get(3),
+                displayStrings.get(4),
+                displayStrings.get(5), displayStrings.get(6), displayStrings.get(7), displayStrings.get(8),
+                displayStrings.get(9),
+                displayStrings.get(10), displayStrings.get(11), displayStrings.get(12), displayStrings.get(13),
+                displayStrings.get(14),
+                displayStrings.get(15), displayStrings.get(16), displayStrings.get(17), displayStrings.get(18),
+                displayStrings.get(19),
+                displayStrings.get(20), displayStrings.get(21), displayStrings.get(22), displayStrings.get(23),
+                displayStrings.get(24));
     }
-
 
     private static String formatCellContent(int firstIndex, int secondIndex, int[][] board) {
         return switch (board[firstIndex][secondIndex]) {
-            case TigerGameStateRewrite.DOG -> String.format("%2d", firstIndex*5+secondIndex); // Dog with ID (padded)
+            case TigerGameStateRewrite.DOG -> String.format("%2d", firstIndex * 5 + secondIndex); // Dog with ID
+                                                                                                  // (padded)
             case TigerGameStateRewrite.TIGER -> " T"; // Tiger
             case TigerGameStateRewrite.EMPTY -> "  "; // Empty
             default -> "??"; // Unknown
         };
     }
-    
+
     private static boolean isDogAlive(int index, int[] board) {
         return index >= 0 && index < board.length && board[index] == 1;
     }
+
     private static String directionName(int dir) {
         return switch (dir) {
             case 1 -> "up-left";
@@ -123,7 +127,6 @@ public class TigerRewriteGame {
             default -> "ayo????";
         };
     }
-    
 
     public void run() {
         while (true) {
@@ -161,28 +164,27 @@ public class TigerRewriteGame {
         }
         display(state);
         System.out.println("GAME OVER");
-        System.out.println("The Winner is " + ((state.getWinner() == TigerGameStateRewrite.TIGER) ? "Tiger":"Dogs"));
+        System.out.println("The Winner is " + ((state.getWinner() == TigerGameStateRewrite.TIGER) ? "Tiger" : "Dogs"));
 
     }
 
-    // method to let (human) dog player pick a dog to move 
+    // method to let (human) dog player pick a dog to move
     private Coord pickDog() {
         Coord ret = null;
         while (true) {
             System.out.print("\nEnter the ID of the dog you want to move: ");
             int dog;
             try {
-                 dog = scanner.nextInt();
-                 ret = TigerGameStateRewrite.oneDToTwoD(dog);
-                 if (state.getNode(ret) == TigerGameStateRewrite.DOG)
-                     break;
+                dog = scanner.nextInt();
+                ret = TigerGameStateRewrite.oneDToTwoD(dog);
+                if (state.getNode(ret) == TigerGameStateRewrite.DOG)
+                    break;
                 System.out.println("❌ That ID doesn't point to a living dog. Try again.");
             } catch (InputMismatchException e) {
                 System.out.println("❌ Invalid input. Please enter a number.");
                 scanner.nextLine(); // Clear invalid input
             }
         }
-
 
         return ret;
     }
@@ -268,26 +270,28 @@ public class TigerRewriteGame {
     public void setup() {
         // Choose whether human plays as Tiger, Dog, or Random
         while (true) {
-            System.out.print("Do you want to play as (T)iger, (D)og, or let the game choose randomly? [T/D/R]: ");
-            String sideInput = scanner.nextLine().trim().toUpperCase();
-            switch (sideInput) {
-                case "T":
-                    humanPlaysAsTiger = true;
-                    System.out.println("You are playing as the Tiger!");
-                    break;
-                case "D":
-                    humanPlaysAsTiger = false;
-                    System.out.println("You are playing as the Dogs!");
-                    break;
-                case "R":
-                    boolean randomBool = rand.nextBoolean();
-                    humanPlaysAsTiger = randomBool;
-                    System.out.println(randomBool ? "You are playing as the Tiger!" : "You are playing as the Dogs!");
-                    break;
-                default:
-                    System.out.println("❌ Invalid input. Please enter T for Tiger, D for Dog, or R for Random.");
-                    continue; // Ask the question again if the input is invalid
+            System.out.print("Do you want to play as tiger, dog, or let the game choose randomly? [t/d/R]: ");
+            String sideInput = scanner.nextLine().toLowerCase();
+            if (sideInput.length() == 0) {
+                humanPlaysAsTiger = rand.nextBoolean();
+            } else {
+
+                switch (sideInput.charAt(0)) {
+                    case 't':
+                        humanPlaysAsTiger = true;
+                        break;
+                    case 'd':
+                        humanPlaysAsTiger = false;
+                        break;
+                    case 'r':
+                        humanPlaysAsTiger = rand.nextBoolean();
+                        break;
+                    default:
+                        System.out.println("❌ Invalid input. Please enter T for Tiger, D for Dog, or R for Random.");
+                        continue; // Ask the question again if the input is invalid
+                }
             }
+            System.out.println(humanPlaysAsTiger ? "You are playing as the Tiger!" : "You are playing as the Dogs!");
             // After selecting the side (Tiger/Dog/Random), set the Minimax depth
             while (true) {
                 System.out.print("Enter the Minimax depth (default is 8): ");
