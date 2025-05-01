@@ -11,8 +11,9 @@ public class GameSelector {
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Game Selector!");
+        boolean play = true;
         
-        while (true) {
+        while (play) {
             System.out.println("Choose a game to play:");
             System.out.println("1. Tic Tac Toe");
             System.out.println("2. Nim Game");
@@ -52,15 +53,35 @@ public class GameSelector {
                     System.out.println("Invalid choice. Please select a valid game.");
                     break;
             }
+            play = playAgain();
         }
     }
 
-    public boolean playAgain(){
+    public static boolean playAgain(){
         boolean valid = false;
         boolean choice = false;
+        String input = "";
         while(!valid){
-            
+            System.out.println("Play Another Game? [y|N]");
+            input = scanner.nextLine();
+            input = input.toLowerCase();
+
+            if (input.length() == 0){
+                return false;
+            }
+            else {
+                switch(input.charAt(0)){
+                    case 'y':
+                        return true;
+                    case 'n':
+                        return false;
+                    default:
+                        continue;
+                }
+
+            }
         }
+        return choice;
     }
 
     private static int getGameChoice() {
@@ -75,6 +96,10 @@ public class GameSelector {
             }
         }
         return choice;
+    }
+
+    private static void test(){
+        System.out.println(playAgain());
     }
 
     private static boolean pickTicTacToePlayerChar() {

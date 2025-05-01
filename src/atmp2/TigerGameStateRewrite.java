@@ -298,11 +298,6 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
         }
     }
 
-    @Override
-    public boolean isGameOver() {
-        return isTerminal();
-    }
-
     public void display() {
         for (int[] row : board) {
             for (int col : row) {

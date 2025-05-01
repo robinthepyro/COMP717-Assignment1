@@ -25,7 +25,7 @@ public class TicTacToeGame {
 
         gameState.displayGameState();
 
-        while (!gameState.isGameOver()) {
+        while (!gameState.isTerminal()) {
             int currentPlayer = gameState.getCurrentPlayer();
             boolean isPlayerTurn = (currentPlayer == X_PLAYER && playerIsX) ||
                                    (currentPlayer == O_PLAYER && !playerIsX);

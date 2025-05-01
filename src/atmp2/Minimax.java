@@ -24,15 +24,15 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     }
 
     public M getBestMove(S state, boolean maximizing) {
-        GameState<M> clonedState = state.clone();
+        // GameState<M> clonedState = state.clone();
         nodesEvaluated = 0;
         M bestMove = null;
         int bestScore = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        for (M move : clonedState.getOptimisedValidMoves()) {
-            clonedState.applyMove(move);
-            int score = minimax(clonedState, 1, !maximizing, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            clonedState.undoMove(move);
+        for (M move : state.getOptimisedValidMoves()) {
+            state.applyMove(move);
+            int score = minimax(state, 1, !maximizing, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            state.undoMove(move);
 
             if ((maximizing && score > bestScore) || (!maximizing && score < bestScore) || bestMove == null) {
                 bestScore = score;
