@@ -25,7 +25,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
     public static final int DOG = 1;
     public static final int EMPTY = 0;
     private static final List<Integer> EAT_PATTERN = Arrays.asList(EMPTY, DOG, TIGER, DOG, EMPTY);
-    private static final int[][] INITIAL_BOARD = new int[][] {
+    private final int[][] INITIAL_BOARD = new int[][] {
             { DOG, DOG, DOG, DOG, DOG },
             { DOG, EMPTY, EMPTY, EMPTY, DOG },
             { DOG, EMPTY, TIGER, EMPTY, DOG },
@@ -74,7 +74,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
 
     // CONSTUCTOR
     TigerGameStateRewrite() {
-        this.board = INITIAL_BOARD.clone();
+        this.board = INITIAL_BOARD;
         this.adj = buildAdjacencyMap(BOARD_SIZE);
         this.numEaten = 0;
         this.history = new Stack<>();
