@@ -2,11 +2,12 @@ package atmp2;
 
 import java.util.Scanner;
 
-public class CoinGame {
+public class CoinGame implements Game{
     private final Scanner scanner = new Scanner(System.in);
     private Minimax<CoinGameMove, CoinGameState> minmax;
     private MemoryTracker memoryTracker = new MemoryTracker();
 
+    @Override
     public void run() {
         System.out.println("Welcome to the Coin Game");
         CoinGameState state = initializeGame();
@@ -50,6 +51,7 @@ public class CoinGame {
         while (true) {
             if (state.isTerminal()) break;
             System.out.println("----------");
+            clearScreen();
             System.out.println(state);
 
             if (state.getCurrentPlayer() == CoinGameState.PLAYER_HUMAN) {
@@ -104,5 +106,8 @@ public class CoinGame {
         game.run();
     }
 
-
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 }

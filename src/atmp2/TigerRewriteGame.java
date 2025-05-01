@@ -12,11 +12,11 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
-public class TigerRewriteGame {
-    public static Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
+public class TigerRewriteGame implements Game {
+    public Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
     public TigerGameStateRewrite state;
-    public static Scanner scanner = new Scanner(System.in);
-    public static Random rand = new Random();
+    public  Scanner scanner = new Scanner(System.in);
+    public  Random rand = new Random();
     boolean humanPlaysAsTiger;
     private static Map<Character, Integer> directionKeyMap = Map.of(
             'Q', 1, 'W', 2, 'E', 3,
@@ -40,64 +40,64 @@ public class TigerRewriteGame {
     );
 
     public TigerRewriteGame() {
-        setup();
         state = new TigerGameStateRewrite();
-
     }
 
     public void test() {
-        display(state);
-        TigerVsDogsMove tMove = humanTigerMove();
-        state.applyMove(tMove);
-        display(state);
-        TigerVsDogsMove dMove = humanDogMove();
-        state.applyMove(dMove);
-        display(state);
-        state.undoMove(dMove);
-        display(state);
+        setup();
+    }
 
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
     public static void display(TigerGameStateRewrite state) {
-        List<String> displayStrings = new ArrayList<>();
+        clearScreen();
+        // Pre-format all cell contents
+        String[][] formattedCells = new String[state.board.length][state.board.length];
         for (int i = 0; i < state.board.length; i++) {
             for (int j = 0; j < state.board.length; j++) {
-                displayStrings.add(formatCellContent(i, j, state.board));
+                formattedCells[i][j] = formatCellContent(i, j, state.board);
             }
         }
 
+        // Display game status
+        System.out.println("\n══════════════════ TIGER VS DOGS ══════════════════");
         System.out.println("Dogs Eaten: " + state.numEaten);
-        System.out.printf("""
-                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
-                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
-                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
-                  |    ＼  |    ／  |    ＼  |    ／  |
-                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
-                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
-                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
-                  |    ／  |    ＼  |    ／  |    ＼  |
-                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
-                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
-                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
-                  |    ＼  |    ／  |    ＼  |    ／  |
-                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
-                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
-                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
-                  |    ／  |    ＼  |    ／  |    ＼  |
-                ╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮
-                │ %s │———│ %s │———│ %s │———│ %s │———│ %s │
-                ╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯
-                """,
-                displayStrings.get(0), displayStrings.get(1), displayStrings.get(2), displayStrings.get(3),
-                displayStrings.get(4),
-                displayStrings.get(5), displayStrings.get(6), displayStrings.get(7), displayStrings.get(8),
-                displayStrings.get(9),
-                displayStrings.get(10), displayStrings.get(11), displayStrings.get(12), displayStrings.get(13),
-                displayStrings.get(14),
-                displayStrings.get(15), displayStrings.get(16), displayStrings.get(17), displayStrings.get(18),
-                displayStrings.get(19),
-                displayStrings.get(20), displayStrings.get(21), displayStrings.get(22), displayStrings.get(23),
-                displayStrings.get(24));
+
+        // Define the components of the grid display
+        String horizontalLine = "│ %s │———│ %s │———│ %s │———│ %s │———│ %s │";
+        String topBottom = "╭────╮   ╭────╮   ╭────╮   ╭────╮   ╭────╮";
+        String bottomTop = "╰────╯   ╰────╯   ╰────╯   ╰────╯   ╰────╯";
+        String diagonalDown = "  |    ＼  |    ／  |    ＼  |    ／  |";
+        String diagonalUp = "  |    ／  |    ＼  |    ／  |    ＼  |";
+
+        // Build and display the grid row by row
+        for (int row = 0; row < state.board.length; row++) {
+            // Top border of cells
+            System.out.println(topBottom);
+
+            // Cell contents with horizontal connections
+            System.out.printf(horizontalLine + "\n",
+                    formattedCells[row][0],
+                    formattedCells[row][1],
+                    formattedCells[row][2],
+                    formattedCells[row][3],
+                    formattedCells[row][4]);
+
+            // Bottom border of cells
+            System.out.println(bottomTop);
+
+            // Skip diagonal connectors after the last row
+            if (row < state.board.length - 1) {
+                // Alternate between diagonal patterns
+                System.out.println(row % 2 == 0 ? diagonalDown : diagonalUp);
+            }
+        }
+
+        // Display game controls or legend if needed
+        System.out.println("\nLegend: T = Tiger, D = Dog, · = Empty");
     }
 
     private static String formatCellContent(int firstIndex, int secondIndex, int[][] board) {
@@ -128,7 +128,10 @@ public class TigerRewriteGame {
         };
     }
 
+    @Override
     public void run() {
+        setup();
+        clearScreen();
         while (true) {
             if (humanPlaysAsTiger) {
                 display(state);
@@ -145,7 +148,6 @@ public class TigerRewriteGame {
                     break;
                 }
             } else {
-
                 display(state);
                 TigerVsDogsMove aMove = minimax.getBestMove(state, true);
                 state.applyMove(aMove);
@@ -165,6 +167,7 @@ public class TigerRewriteGame {
         display(state);
         System.out.println("GAME OVER");
         System.out.println("The Winner is " + ((state.getWinner() == TigerGameStateRewrite.TIGER) ? "Tiger" : "Dogs"));
+        scanner.nextLine();
 
     }
 
@@ -268,53 +271,42 @@ public class TigerRewriteGame {
     }
 
     public void setup() {
-        // Choose whether human plays as Tiger, Dog, or Random
-        while (true) {
-            System.out.print("Do you want to play as tiger, dog, or let the game choose randomly? [t/d/R]: ");
-            String sideInput = scanner.nextLine().toLowerCase();
-            if (sideInput.length() == 0) {
-                humanPlaysAsTiger = rand.nextBoolean();
-            } else {
-
-                switch (sideInput.charAt(0)) {
-                    case 't':
-                        humanPlaysAsTiger = true;
-                        break;
-                    case 'd':
-                        humanPlaysAsTiger = false;
-                        break;
-                    case 'r':
-                        humanPlaysAsTiger = rand.nextBoolean();
-                        break;
-                    default:
-                        System.out.println("❌ Invalid input. Please enter T for Tiger, D for Dog, or R for Random.");
-                        continue; // Ask the question again if the input is invalid
-                }
-            }
-            System.out.println(humanPlaysAsTiger ? "You are playing as the Tiger!" : "You are playing as the Dogs!");
-            // After selecting the side (Tiger/Dog/Random), set the Minimax depth
-            while (true) {
-                System.out.print("Enter the Minimax depth (default is 8): ");
-                String depthInput = scanner.nextLine().trim();
-                if (depthInput.isEmpty()) {
-                    minimax = new Minimax<>(8);
-                    System.out.println("Using default Minimax depth of 8.");
-                    return; // Exit the method after setting the depth
-                }
-                try {
-                    int depth = Integer.parseInt(depthInput);
-                    if (depth <= 0) {
-                        System.out.println("❌ Minimax depth must be a positive number. Please try again.");
-                    } else {
-                        minimax = new Minimax<>(depth);
-                        System.out.println("Minimax depth set to " + depth + ".");
-                        return; // Exit the method after setting the depth
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("❌ Invalid input. Please enter a valid integer for depth.");
-                }
+        boolean invalid = true;
+        state = new TigerGameStateRewrite();
+        while (invalid) {
+            System.out.println("Would you like to play as the tiger, dogs, or a random side [t|d|R]");
+            char input = scanner.nextLine().toLowerCase().charAt(0);
+            switch (input) {
+                case 't':
+                    // tiger
+                    humanPlaysAsTiger = true;
+                    invalid = false;
+                    break;
+                case 'd':
+                    // dog
+                    humanPlaysAsTiger = true;
+                    invalid = false;
+                    break;
+                case 'r':
+                    // random
+                    humanPlaysAsTiger = rand.nextBoolean();
+                    invalid = false;
+                    break;
+                default:
+                    // try again
+                    System.out.println("Invalid Selection, enter one of the following [t|d|R]");
             }
         }
+        int depth = 5;
+        System.out.printf("Enter minimax depth (default %d).\n", depth);
+        String input = scanner.nextLine();
+        try {
+            depth = Integer.parseInt(input);
+
+        } catch (NumberFormatException e) {
+            System.out.printf("Invalid integer, using depth = %d\n",depth);
+        }
+        this.minimax = new Minimax<>(depth);
     }
 
     public static void main(String[] args) {

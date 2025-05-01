@@ -8,11 +8,10 @@ import atmp2.TigerRewriteGame;
 
 public class GameSelector {
     private static Scanner scanner = new Scanner(System.in);
-
+    private Game game;
     public static void main(String[] args) {
         System.out.println("Welcome to the Game Selector!");
         boolean play = true;
-        
         while (play) {
             System.out.println("Choose a game to play:");
             System.out.println("1. Tic Tac Toe");
@@ -20,31 +19,28 @@ public class GameSelector {
             System.out.println("3. Coin Game");
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
-
             int choice = getGameChoice();
-
             switch (choice) {
                 case 1:
                     // Setup for Tic Tac Toe
                     boolean playerIsX = pickTicTacToePlayerChar();
                     int difficulty = pickTicTacToeDifficulty();
-                    TicTacToeGame ticTacToeGame = new TicTacToeGame(playerIsX, difficulty);
-                    ticTacToeGame.run();
+                    Game game = new TicTacToeGame(playerIsX, difficulty);
+                    game.run();
                     break;
                 case 2:
                     // Setup for Nim Game
-                    NimGame nimGame = new NimGame();
-                    nimGame.run();
+                    game = new NimGame();
+                    game.run();
                     break;
                 case 3:
-                    CoinGame coinGame = new CoinGame();
-                    coinGame.run();
+                    game = new CoinGame();
+                    game.run();
                     break;
                 case 4:
-                    TigerRewriteGame tigerVsDogsGame = new TigerRewriteGame();
-                    tigerVsDogsGame.run();
+                    game = new TigerRewriteGame();
+                    game.run();
                     break;
-
                 case 5:
                     System.out.println("Exiting...");
                     scanner.close();
@@ -53,7 +49,9 @@ public class GameSelector {
                     System.out.println("Invalid choice. Please select a valid game.");
                     break;
             }
+            scanner.nextLine();
             play = playAgain();
+
         }
     }
 

@@ -2,7 +2,7 @@ package atmp2;
 
 import java.util.Scanner;
 
-public class TicTacToeGame {
+public class TicTacToeGame implements Game{
     private static final int X_PLAYER = 1;
     private static final int O_PLAYER = 2;
 
@@ -20,15 +20,16 @@ public class TicTacToeGame {
 
     public void run() {
         System.out.println("Welcome to Tic Tac Toe!");
-        System.out.println("You are " + (playerIsX ? "X" : "O") + " and " + 
-                           (playerIsX ? "go first" : "go second"));
+        System.out.println("You are " + (playerIsX ? "X" : "O") + " and " +
+                (playerIsX ? "go first" : "go second"));
 
+        clearScreen();
         gameState.displayGameState();
 
         while (!gameState.isTerminal()) {
             int currentPlayer = gameState.getCurrentPlayer();
             boolean isPlayerTurn = (currentPlayer == X_PLAYER && playerIsX) ||
-                                   (currentPlayer == O_PLAYER && !playerIsX);
+                    (currentPlayer == O_PLAYER && !playerIsX);
 
             if (isPlayerTurn) {
                 playerMove();
@@ -36,6 +37,7 @@ public class TicTacToeGame {
                 aiMove();
             }
 
+            clearScreen();
             gameState.displayGameState();
         }
 
@@ -98,9 +100,14 @@ public class TicTacToeGame {
             System.out.println("Game over! It's a draw!");
         } else {
             boolean playerWon = (winner == X_PLAYER && playerIsX) ||
-                                (winner == O_PLAYER && !playerIsX);
+                    (winner == O_PLAYER && !playerIsX);
             System.out.println("Game over! " + (playerWon ? "You win!" : "AI wins!"));
         }
+    }
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
 }

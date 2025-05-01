@@ -74,7 +74,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
 
     // CONSTUCTOR
     TigerGameStateRewrite() {
-        this.board = INITIAL_BOARD;
+        this.board = INITIAL_BOARD.clone();
         this.adj = buildAdjacencyMap(BOARD_SIZE);
         this.numEaten = 0;
         this.history = new Stack<>();

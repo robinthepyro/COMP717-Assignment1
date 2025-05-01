@@ -144,21 +144,30 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         return (playerCount > 0 && emptyCount > 0 && playerCount + emptyCount == 3) ? 1 : 0;
     }
 
-    // TODO change this to print the most gorgeous terminal noughts and crosses u have ever seen
-    // Try using ASCII box drawing characters
-    public void displayGameState() {
-        System.out.println("\n-------------");
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            System.out.print("| ");
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                char symbol = ' ';
-                if (board[i][j] == X_PLAYER) symbol = 'X';
-                if (board[i][j] == O_PLAYER) symbol = 'O';
-                System.out.print(symbol + " | ");
-            }
-            System.out.println("\n-------------");
+public void displayGameState() {
+    final String TOP_BORDER    = "┌───┬───┬───┐";
+    final String MID_SEPARATOR = "├───┼───┼───┤";
+    final String BOTTOM_BORDER = "└───┴───┴───┘";
+    final String VERT_SEP      = "│";
+
+    System.out.println(TOP_BORDER);
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        System.out.print(VERT_SEP);
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            char symbol = ' ';
+            if (board[i][j] == X_PLAYER) symbol = 'X';
+            if (board[i][j] == O_PLAYER) symbol = 'O';
+            System.out.print(" " + symbol + " " + VERT_SEP);
+        }
+        System.out.println();
+
+        if (i < BOARD_SIZE - 1) {
+            System.out.println(MID_SEPARATOR);
+        } else {
+            System.out.println(BOTTOM_BORDER);
         }
     }
+}
 
     public int getCurrentPlayer() {
         return currentPlayer;
