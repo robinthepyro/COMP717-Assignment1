@@ -39,7 +39,7 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
     @Override
     public List<TicTacToeMove> getValidMoves() {
         List<TicTacToeMove> moves = new ArrayList<>();
-        if (isGameOver()) return moves;
+        if (isTerminal()) return moves;
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -78,13 +78,8 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
     }
 
     @Override
-    public boolean isGameOver() {
-        return getWinner() != 0 || movesPlayed >= BOARD_SIZE * BOARD_SIZE;
-    }
-
-    @Override
     public boolean isTerminal() {
-        return isGameOver();
+        return getWinner() != 0 || movesPlayed >= BOARD_SIZE * BOARD_SIZE;
     }
 
     public int getWinner() {
@@ -114,7 +109,7 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         int winner = getWinner();
         if (winner == X_PLAYER) return 1;      // X wins
         if (winner == O_PLAYER) return -1;     // O wins
-        if (isGameOver()) return 0;            // Draw
+        if (isTerminal()) return 0;            // Draw
 
         // Heuristic: count potential winning lines
         int xPotential = countPotentialWins(X_PLAYER);

@@ -113,12 +113,6 @@ public class NimGameState implements GameState<NimMove> {
         return true;
     }
     
-    // TODO remove this redundant method once the interface no longer includes it
-    // we are waiting on removal from TicTacToeGameState first but that's a mess rn
-    public boolean isGameOver() {
-        return isTerminal();
-    }
-
     @Override
     public int evaluate() {
         if (isTerminal()){

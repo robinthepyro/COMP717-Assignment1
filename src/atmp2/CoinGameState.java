@@ -17,7 +17,6 @@ public class CoinGameState implements GameState<CoinGameMove> {
     private int playerScore = 0;
     private int aiScore = 0;
 
-
     public CoinGameState(int startingPlayer, int gameSize) {
         this.gameSize = gameSize;
         currentPlayer = startingPlayer;
@@ -28,7 +27,8 @@ public class CoinGameState implements GameState<CoinGameMove> {
         fillBoard();
     }
 
-    private CoinGameState(int[] board, int gameSize, int currentPlayer, int leftPointer, int rightPointer, int playerScore, int aiScore){
+    private CoinGameState(int[] board, int gameSize, int currentPlayer, int leftPointer, int rightPointer,
+            int playerScore, int aiScore) {
         this.board = board;
         this.gameSize = gameSize;
         this.currentPlayer = currentPlayer;
@@ -54,8 +54,8 @@ public class CoinGameState implements GameState<CoinGameMove> {
      * Switches to the AI player if the human is currently playing. Visa Versa.
      */
     public void swapPlayer() {
-       currentPlayer = (currentPlayer == CoinGameState.PLAYER_HUMAN) ?
-               CoinGameState.PLAYER_AI : CoinGameState.PLAYER_HUMAN;
+        currentPlayer = (currentPlayer == CoinGameState.PLAYER_HUMAN) ? CoinGameState.PLAYER_AI
+                : CoinGameState.PLAYER_HUMAN;
     }
 
     private void fillBoard() {
@@ -74,7 +74,8 @@ public class CoinGameState implements GameState<CoinGameMove> {
     public List<CoinGameMove> getValidMoves() {
         List<CoinGameMove> moves = new ArrayList<>();
 
-        if (isGameOver()) return moves;
+        if (isTerminal())
+            return moves;
 
         moves.add(new CoinGameMove(Side.LEFT, currentPlayer));
         moves.add(new CoinGameMove(Side.RIGHT, currentPlayer));
@@ -124,17 +125,12 @@ public class CoinGameState implements GameState<CoinGameMove> {
 
     @Override
     public boolean isTerminal() {
-        return isGameOver();
+        return leftPointer >= rightPointer;
     }
 
     @Override
     public int evaluate() {
-        return  aiScore - playerScore;
-    }
-
-    @Override
-    public boolean isGameOver() {
-        return leftPointer >= rightPointer;
+        return aiScore - playerScore;
     }
 
     @Override
@@ -163,7 +159,7 @@ public class CoinGameState implements GameState<CoinGameMove> {
     }
 
     @Override
-    public CoinGameState clone(){
+    public CoinGameState clone() {
         return new CoinGameState(board, gameSize, currentPlayer, leftPointer, rightPointer, playerScore, aiScore);
     }
 }
