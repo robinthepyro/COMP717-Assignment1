@@ -48,8 +48,8 @@ public class TicTacToeGame {
         boolean validMove = false;
 
         do {
-            row = getValidInput("Enter row (0-2): ");
-            col = getValidInput("Enter column (0-2): ");
+            row = getValidInput("Enter row (1-3): ");
+            col = getValidInput("Enter column (1-3): ");
 
             TicTacToeMove move = new TicTacToeMove(row, col, gameState.getCurrentPlayer());
 
@@ -69,11 +69,13 @@ public class TicTacToeGame {
             System.out.print(prompt);
             if (scanner.hasNextInt()) {
                 input = scanner.nextInt();
+                // adjust from human friendly 1 based indexing to 0 based indexing
+                input--;
                 if (input >= 0 && input <= 2) {
                     scanner.nextLine(); // clear newline
                     return input;
                 } else {
-                    System.out.println("Input out of bounds! Enter a number between 0 and 2.");
+                    System.out.println("Input out of bounds! Enter a number between 1 and 3.");
                 }
             } else {
                 System.out.println("Invalid input! Please enter a number.");
