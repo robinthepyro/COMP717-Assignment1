@@ -1,5 +1,3 @@
-//TODO! comment this code better
-
 package atmp2;
 
 import java.util.Scanner;

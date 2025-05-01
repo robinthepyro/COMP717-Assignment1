@@ -220,21 +220,6 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
     @Override
     public List<TigerVsDogsMove> getOptimisedValidMoves() {
         List<TigerVsDogsMove> ret = getValidMoves();
-        // this is a really ugly hack
-        // what it does is modify the priority of moves based on how many open spaces it leaves
-        // the tiger.
-        // This makes it more likely for good dog moves to be shown to the minimax algo first.
-        // THIS IS VERY IMPORTANT.
-        // Doing this effectively makes it so that when the minimax has insufficient depth to
-        // explore the game tree it can still be likely to pick the best move for dogs.
-        // In a perfect world I would have integrated this functionality into the evaluate
-        // function, but here we are. I don't really want to touch this because it works. 
-        for (TigerVsDogsMove move: ret){
-            applyMove(move);
-            move.setPriority(getEmptyAdjacent(getTigerPos()).size());
-            undoMove(move);
-        }
-        ret.sort(Comparator.comparingInt(TigerVsDogsMove::sortBy));
         return ret;
     }
 
@@ -292,8 +277,11 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
             case DOG:
                 return -100;
             default: {
-                return numEaten ;
-                // return 0;
+                // this is a kinda arbitrary way of evaluating positions but it WORKS
+                // due to the complexity of the game trees in TVD a good heuristic is
+                // key and I think I stumbled on a really really good one
+                return numEaten * 2 - getEmptyAdjacent(getTigerPos()).size();
+
             }
         }
     }

@@ -49,7 +49,6 @@ public class GameSelector {
                     System.out.println("Invalid choice. Please select a valid game.");
                     break;
             }
-            scanner.nextLine();
             play = playAgain();
 
         }

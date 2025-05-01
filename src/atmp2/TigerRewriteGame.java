@@ -15,8 +15,8 @@ import java.util.Set;
 public class TigerRewriteGame implements Game {
     public Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
     public TigerGameStateRewrite state;
-    public  Scanner scanner = new Scanner(System.in);
-    public  Random rand = new Random();
+    public Scanner scanner = new Scanner(System.in);
+    public Random rand = new Random();
     boolean humanPlaysAsTiger;
     private static Map<Character, Integer> directionKeyMap = Map.of(
             'Q', 1, 'W', 2, 'E', 3,
@@ -236,6 +236,21 @@ public class TigerRewriteGame implements Game {
     }
 
     private Coord pickDirection(List<Integer> directions) {
+        String ul = "[q] ↖";
+        String up = "[w] ↑";
+        String ur = "[e] ↗";
+        String le = "[a] ←";
+        String ri = "[d] →";
+        String dl = "[z] ↙";
+        String dw = "[s] ↓";
+        String dr = "[c] ↘";
+
+        System.out.printf("    %s     %s     %s\n");
+        System.out.println();
+        System.out.printf("    %s               %s\n");
+        System.out.println();
+        System.out.printf("    %s     %s     %s\n");
+        System.out.print("Enter a direction:");
 
         System.out.println("Available Directions: ");
         for (Map.Entry<Character, Integer> entry : directionKeyMap.entrySet()) {
@@ -250,7 +265,6 @@ public class TigerRewriteGame implements Game {
         // Get the user's choice
         char choice = ' ';
         while (true) {
-            System.out.print("Enter a direction (Q, W, E, A, S, D, Z, X, C): ");
             String input = scanner.next();
 
             if (input.length() == 1) { // Check if the input is a single character
@@ -284,7 +298,7 @@ public class TigerRewriteGame implements Game {
                     break;
                 case 'd':
                     // dog
-                    humanPlaysAsTiger = true;
+                    humanPlaysAsTiger = false;
                     invalid = false;
                     break;
                 case 'r':
@@ -304,7 +318,7 @@ public class TigerRewriteGame implements Game {
             depth = Integer.parseInt(input);
 
         } catch (NumberFormatException e) {
-            System.out.printf("Invalid integer, using depth = %d\n",depth);
+            System.out.printf("Invalid integer, using depth = %d\n", depth);
         }
         this.minimax = new Minimax<>(depth);
     }
