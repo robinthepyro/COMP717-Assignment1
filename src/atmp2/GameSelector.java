@@ -85,7 +85,7 @@ public class GameSelector {
         int choice = -1;
         // TODO fix this hardcoded garbage?
         while (choice < 1 || choice > 5) {
-            System.out.print("Enter your choice (1, 2, or 3 to Exit): ");
+            System.out.print("Enter your choice (1, 2, 3, 4 or 5 to Exit): ");
             try {
                 choice = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {

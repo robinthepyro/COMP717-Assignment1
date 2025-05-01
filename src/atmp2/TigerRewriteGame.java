@@ -1,6 +1,7 @@
 package atmp2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Stack;
 
@@ -236,31 +237,38 @@ public class TigerRewriteGame implements Game {
     }
 
     private Coord pickDirection(List<Integer> directions) {
-        String ul = "[q] ↖";
-        String up = "[w] ↑";
-        String ur = "[e] ↗";
-        String le = "[a] ←";
-        String ri = "[d] →";
-        String dl = "[z] ↙";
-        String dw = "[s] ↓";
-        String dr = "[c] ↘";
-
-        System.out.printf("    %s     %s     %s\n");
-        System.out.println();
-        System.out.printf("    %s               %s\n");
-        System.out.println();
-        System.out.printf("    %s     %s     %s\n");
-        System.out.print("Enter a direction:");
+        Map<Integer, String> keyMapPrettyStrings = new HashMap<>();
+        keyMapPrettyStrings.put(1, "[q] ↖"); // NW
+        keyMapPrettyStrings.put(2, "[w] ↑"); // N
+        keyMapPrettyStrings.put(3, "[e] ↗"); // NE
+        keyMapPrettyStrings.put(4, "[a] ←"); // W
+        keyMapPrettyStrings.put(5, "[d] →"); // E
+        keyMapPrettyStrings.put(6, "[z] ↙"); // SW
+        keyMapPrettyStrings.put(7, "[s] ↓"); // S
+        keyMapPrettyStrings.put(8, "[c] ↘"); // SE
 
         System.out.println("Available Directions: ");
         for (Map.Entry<Character, Integer> entry : directionKeyMap.entrySet()) {
             char key = entry.getKey();
             int directionNumber = entry.getValue();
 
-            if (directions.contains(directionNumber)) {
-                System.out.println(key + ": " + directionNames.get(directionNumber));
+            if (!directions.contains(directionNumber)) {
+                keyMapPrettyStrings.put(directionNumber, "     ");
             }
         }
+        System.out.printf("    %s     %s     %s\n\n",
+                keyMapPrettyStrings.get(1),
+                keyMapPrettyStrings.get(2),
+                keyMapPrettyStrings.get(3));
+
+        System.out.printf("    %s               %s\n\n",
+                keyMapPrettyStrings.get(4),
+                keyMapPrettyStrings.get(5));
+        System.out.printf("    %s     %s     %s\n\n",
+                keyMapPrettyStrings.get(6),
+                keyMapPrettyStrings.get(7),
+                keyMapPrettyStrings.get(8));
+        System.out.print("Enter a direction:");
 
         // Get the user's choice
         char choice = ' ';
@@ -289,7 +297,12 @@ public class TigerRewriteGame implements Game {
         state = new TigerGameStateRewrite();
         while (invalid) {
             System.out.println("Would you like to play as the tiger, dogs, or a random side [t|d|R]");
-            char input = scanner.nextLine().toLowerCase().charAt(0);
+            String raw = scanner.nextLine();
+            if (raw.length() == 0){
+                humanPlaysAsTiger = rand.nextBoolean();
+                break;
+            }
+            char input = raw.toLowerCase().charAt(0);
             switch (input) {
                 case 't':
                     // tiger
