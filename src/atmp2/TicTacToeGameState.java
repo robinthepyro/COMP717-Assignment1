@@ -7,7 +7,7 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
     private static final int X_PLAYER = 1;
     private static final int O_PLAYER = 2;
     private static final int BOARD_SIZE = 3;
-    
+
     private int[][] board;
     private int currentPlayer;
     private int movesPlayed;
@@ -24,7 +24,7 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         this.movesPlayed = movesPlayed;
     }
 
-    public TicTacToeGameState clone(){
+    public TicTacToeGameState clone() {
         return new TicTacToeGameState(board, currentPlayer, movesPlayed);
     }
 
@@ -39,7 +39,8 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
     @Override
     public List<TicTacToeMove> getValidMoves() {
         List<TicTacToeMove> moves = new ArrayList<>();
-        if (isTerminal()) return moves;
+        if (isTerminal())
+            return moves;
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -92,7 +93,7 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
                 return board[0][i];
             }
         }
-        
+
         // Check diagonals
         if (board[0][0] != 0 && board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
             return board[0][0];
@@ -100,16 +101,19 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         if (board[0][2] != 0 && board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
             return board[0][2];
         }
-        
+
         return 0; // No winner
     }
 
     @Override
     public int evaluate() {
         int winner = getWinner();
-        if (winner == X_PLAYER) return 1;      // X wins
-        if (winner == O_PLAYER) return -1;     // O wins
-        if (isTerminal()) return 0;            // Draw
+        if (winner == X_PLAYER)
+            return 1; // X wins
+        if (winner == O_PLAYER)
+            return -1; // O wins
+        if (isTerminal())
+            return 0; // Draw
 
         // Heuristic: count potential winning lines
         int xPotential = countPotentialWins(X_PLAYER);
@@ -124,12 +128,12 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         // Check rows, columns, and diagonals
         for (int i = 0; i < BOARD_SIZE; i++) {
             count += checkLineForPotentialWin(player, board[i]);
-            count += checkLineForPotentialWin(player, new int[]{board[0][i], board[1][i], board[2][i]});
+            count += checkLineForPotentialWin(player, new int[] { board[0][i], board[1][i], board[2][i] });
         }
 
         // Check diagonals
-        count += checkLineForPotentialWin(player, new int[]{board[0][0], board[1][1], board[2][2]});
-        count += checkLineForPotentialWin(player, new int[]{board[0][2], board[1][1], board[2][0]});
+        count += checkLineForPotentialWin(player, new int[] { board[0][0], board[1][1], board[2][2] });
+        count += checkLineForPotentialWin(player, new int[] { board[0][2], board[1][1], board[2][0] });
 
         return count;
     }
@@ -138,36 +142,41 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
         int playerCount = 0;
         int emptyCount = 0;
         for (int cell : line) {
-            if (cell == player) playerCount++;
-            if (cell == 0) emptyCount++;
+            if (cell == player)
+                playerCount++;
+            if (cell == 0)
+                emptyCount++;
         }
         return (playerCount > 0 && emptyCount > 0 && playerCount + emptyCount == 3) ? 1 : 0;
     }
 
-public void displayGameState() {
-    final String TOP_BORDER    = "┌───┬───┬───┐";
-    final String MID_SEPARATOR = "├───┼───┼───┤";
-    final String BOTTOM_BORDER = "└───┴───┴───┘";
-    final String VERT_SEP      = "│";
+    public void displayGameState() {
+        final String TOP_BORDER = "┌───┬───┬───┐";
+        final String MID_SEPARATOR = "├───┼───┼───┤";
+        final String BOTTOM_BORDER = "└───┴───┴───┘";
+        final String VERT_SEP = "│";
 
-    System.out.println(TOP_BORDER);
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        System.out.print(VERT_SEP);
-        for (int j = 0; j < BOARD_SIZE; j++) {
-            char symbol = ' ';
-            if (board[i][j] == X_PLAYER) symbol = 'X';
-            if (board[i][j] == O_PLAYER) symbol = 'O';
-            System.out.print(" " + symbol + " " + VERT_SEP);
-        }
-        System.out.println();
+        System.out.println(TOP_BORDER);
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            System.out.print(VERT_SEP);
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                char symbol = ' ';
+                if (board[i][j] == X_PLAYER)
+                    symbol = 'X';
+                if (board[i][j] == O_PLAYER)
+                    symbol = 'O';
+                System.out.print(" " + symbol + " " + VERT_SEP);
+            }
+            System.out.println();
 
-        if (i < BOARD_SIZE - 1) {
-            System.out.println(MID_SEPARATOR);
-        } else {
-            System.out.println(BOTTOM_BORDER);
+            if (i < BOARD_SIZE - 1) {
+                System.out.println(MID_SEPARATOR);
+            } else {
+                System.out.println(BOTTOM_BORDER);
+            }
         }
     }
-}
+
 
     public int getCurrentPlayer() {
         return currentPlayer;

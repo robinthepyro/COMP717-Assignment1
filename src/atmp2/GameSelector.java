@@ -13,6 +13,7 @@ public class GameSelector {
     public static void main(String[] args) {
         System.out.println("Welcome to the Game Selector!");
         boolean play = true;
+        boolean humanVsAi = playerVsAi();
         while (play) {
             System.out.println("Choose a game to play:");
             System.out.println("1. Tic Tac Toe");
@@ -21,13 +22,11 @@ public class GameSelector {
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
             int choice = getGameChoice();
-            int mode = pickMode();
+            int mode = pickMinimaxMode();
             switch (choice) {
                 case 1:
                     // Setup for Tic Tac Toe
-                    boolean playerIsX = pickTicTacToePlayerChar();
-                    int difficulty = pickTicTacToeDifficulty();
-                    Game game = new TicTacToeGame(playerIsX, difficulty, mode);
+                    Game game = new TicTacToeGame(mode);
                     game.run();
                     break;
                 case 2:
@@ -100,42 +99,28 @@ public class GameSelector {
         System.out.println(playAgain());
     }
 
-    private static boolean pickTicTacToePlayerChar() {
-        String input;
-        boolean playerIsX = false;
+    private static boolean playerVsAi() {
+        System.out.println("Would you like to play human vs ai or view and AI vs AI demo? [P]lay [d]emo [q]uit: ");
         while (true) {
-            System.out.print("Do you want to play as X (goes first) or O (goes second)? ");
-            input = scanner.nextLine().toUpperCase();
-            if (input.equals("X")) {
-                playerIsX = true;
-                break;
-            } else if (input.equals("O")) {
-                playerIsX = false;
-                break;
-            } else {
-                System.out.println("Invalid input. Please enter X or O.");
+            String raw = scanner.nextLine().toLowerCase();
+            if (raw.length() == 0) {
+                return true;
+            }
+            char choice = raw.charAt(0);
+            switch (choice) {
+                case 'p':
+                    return true;
+                case 'd':
+                    return false;
+                default:
+                    System.out.println("Invalid Selection, enter [P]lay [d]emo or [q]uit");
             }
         }
-        return playerIsX;
     }
 
-    private static int pickTicTacToeDifficulty() {
-        int difficulty = -1;
-        while (difficulty < 1 || difficulty > 10) {
-            System.out.print("Enter AI difficulty (1-10): ");
-            try {
-                difficulty = Integer.parseInt(scanner.nextLine());
-                if (difficulty < 1 || difficulty > 10) {
-                    System.out.println("Please enter a number between 1 and 10.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-            }
-        }
-        return difficulty;
-    }
+    
 
-    private static int pickMode() {
+    private static int pickMinimaxMode() {
         while (true) {
             // int ABLIMITED = 0;
             // int ABCOMPLETE = 1;
@@ -150,14 +135,12 @@ public class GameSelector {
 
             try {
                 int choice = Integer.parseInt(scanner.nextLine());
-                if (choice > 0 && choice < 5) {
-                    return choice;
+                if (choice > 0 && choice < 4) {
+                    return choice - 1;
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid Selection");
             }
-
         }
-
     }
 }

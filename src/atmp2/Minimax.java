@@ -13,6 +13,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     public static final int ABCOMPLETE = 1;
     public static final int MINIMAXLIMITED = 2;
     public static final int MINIMAX_COMPLETE = 3;
+    public static final int RANDOM = 4;
 
     public Minimax(int maxDepth, int mode) {
         this.maxDepth = maxDepth;
@@ -22,7 +23,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
 
     public Minimax(int mode){
         // sanity check my code
-        if (mode > MINIMAX_COMPLETE | mode < AB_LIMITED){
+        if (mode > RANDOM | mode < AB_LIMITED){
             System.err.println("You Should Not Be Doing that. Do better <3");
             System.out.println("Listen to this song and think about what you have done");
             throw new IllegalArgumentException("https://open.spotify.com/track/3gq0rDxpS9e6sbO72PBWbn");
@@ -62,6 +63,12 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     }
 
     public M getBestMove(S state, boolean maximizing) {
+        // stupid way to make minimax play random moves
+        // yeah, we have stupid mode
+        // yeah, it makes the ai stupid
+        if (mode == RANDOM){
+            return getRandomMove(state);
+        }
         // GameState<M> clonedState = state.clone();
         nodesEvaluated = 0;
         M bestMove = null;
@@ -70,7 +77,6 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         for (M move : state.getOptimisedValidMoves()) {
             state.applyMove(move);
             int score;
-            System.out.println("mode = " + mode);
             score = minimax(state, 1, !maximizing, Integer.MAX_VALUE, Integer.MIN_VALUE);
             state.undoMove(move);
 
@@ -88,7 +94,6 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     private int minimax(GameState<M> state, int depth, boolean maximizing, int alpha, int beta) {
 
         nodesEvaluated++;
-
         if (limited) {
             if (state.isTerminal() || depth >= maxDepth) {
                 return state.evaluate();
@@ -122,5 +127,4 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
 
         return best;
     }
-
 }

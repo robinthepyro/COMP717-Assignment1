@@ -4,31 +4,35 @@ import java.util.Scanner;
 
 import atmp2.Minimax;
 
-public class CoinGame implements Game{
+public class CoinGame implements Game {
     private final Scanner scanner = new Scanner(System.in);
     private Minimax<CoinGameMove, CoinGameState> minmax;
     private MemoryTracker memoryTracker = new MemoryTracker();
     private int mode;
+    private CoinGameState state;
 
-    public CoinGame(int mode){
+    public CoinGame(int mode) {
         this.mode = mode;
     }
 
     @Override
     public void run() {
         System.out.println("Welcome to the Coin Game");
-        CoinGameState state = initializeGame();
+        state = initializeGame();
         playGame(state);
     }
 
     private CoinGameState initializeGame() {
         boolean playerStarts = getPlayerStartChoice();
-        int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN :
-                CoinGameState.PLAYER_AI;
+        int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN : CoinGameState.PLAYER_AI;
 
         CoinGameState state = new CoinGameState(chosenStartPlayer, 20);
 
-        int minmaxDepth = getMinMaxDepth();
+        int minmaxDepth = -1;
+        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAXLIMITED) {
+
+            minmaxDepth = getMinMaxDepth();
+        }
         minmax = new Minimax<>(minmaxDepth, mode);
 
         return state;
@@ -56,11 +60,10 @@ public class CoinGame implements Game{
 
     private void playGame(CoinGameState state) {
         while (true) {
-            if (state.isTerminal()) break;
-            System.out.println("----------");
+            if (state.isTerminal())
+                break;
             clearScreen();
-            System.out.println(state);
-
+            displayState();
             if (state.getCurrentPlayer() == CoinGameState.PLAYER_HUMAN) {
                 state.applyMove(getPlayerMove(state));
             } else {
@@ -87,7 +90,6 @@ public class CoinGame implements Game{
 
     private CoinGameMove getPlayerMove(CoinGameState state) {
         while (true) {
-            System.out.println("Will you pick from the left or right? (l/r)");
             String input = scanner.nextLine().trim().toLowerCase();
             if (input.startsWith("l")) {
                 return new CoinGameMove(Side.LEFT, state.getCurrentPlayer());
@@ -117,4 +119,19 @@ public class CoinGame implements Game{
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
+
+    private void displayState() {
+        clearScreen();
+        System.out.println("─".repeat(state.toString().length()));
+        System.out.println(state);
+        System.out.println("─".repeat(state.toString().length()));
+        System.out.println("You: " + state.getPlayerScore() + " AI:" + state.getAiScore());
+        System.out.println("Will you pick from the left or right? (l/r)");
+    }
+
+	@Override
+	public void demo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'demo'");
+	}
 }

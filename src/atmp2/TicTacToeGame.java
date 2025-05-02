@@ -2,34 +2,42 @@ package atmp2;
 
 import java.util.Scanner;
 
-public class TicTacToeGame implements Game{
+import atmp2.TicTacToeGameState;
+import atmp2.TicTacToeMove;
+
+public class TicTacToeGame implements Game {
     private static final int X_PLAYER = 1;
     private static final int O_PLAYER = 2;
 
-    private final TicTacToeGameState gameState;
-    private final Minimax<TicTacToeMove, TicTacToeGameState> minimax;
-    private final Scanner scanner;
+    private TicTacToeGameState state;
+    private Minimax<TicTacToeMove, TicTacToeGameState> minimax;
+    private static Scanner scanner = new Scanner(System.in);
     private final boolean playerIsX;
-    int mode;
+    int minimaxMode;
 
-    public TicTacToeGame(boolean playerIsX, int maxDepth, int mode) {
-        this.mode = mode;
-        this.gameState = new TicTacToeGameState();
-        this.minimax = new Minimax<>(maxDepth, mode);
-        this.scanner = new Scanner(System.in); // keep internal Scanner
-        this.playerIsX = playerIsX;
+    public TicTacToeGame(int minimaxMode) {
+        this.minimaxMode = minimaxMode;
+        this.state = new TicTacToeGameState();
+        this.playerIsX = pickTicTacToePlayerChar();
+    }
+
+    // Demo mode constructor BE VERY CAREFUL!
+    public TicTacToeGame(){
+        this.state = new TicTacToeGameState();
+        this.playerIsX = true; // dunno why im defining this but compiler complains
     }
 
     public void run() {
+        minimax = new Minimax<>(pickDepth(), minimaxMode);
         System.out.println("Welcome to Tic Tac Toe!");
         System.out.println("You are " + (playerIsX ? "X" : "O") + " and " +
                 (playerIsX ? "go first" : "go second"));
 
         clearScreen();
-        gameState.displayGameState();
+        state.displayGameState();
 
-        while (!gameState.isTerminal()) {
-            int currentPlayer = gameState.getCurrentPlayer();
+        while (!state.isTerminal()) {
+            int currentPlayer = state.getCurrentPlayer();
             boolean isPlayerTurn = (currentPlayer == X_PLAYER && playerIsX) ||
                     (currentPlayer == O_PLAYER && !playerIsX);
 
@@ -40,14 +48,14 @@ public class TicTacToeGame implements Game{
             }
 
             clearScreen();
-            gameState.displayGameState();
+            state.displayGameState();
         }
 
         printResult();
     }
 
     private void playerMove() {
-        System.out.println("Your turn (" + (gameState.getCurrentPlayer() == X_PLAYER ? "X" : "O") + ")");
+        System.out.println("Your turn (" + (state.getCurrentPlayer() == X_PLAYER ? "X" : "O") + ")");
         int row, col;
         boolean validMove = false;
 
@@ -55,10 +63,10 @@ public class TicTacToeGame implements Game{
             row = getValidInput("Enter row (1-3): ");
             col = getValidInput("Enter column (1-3): ");
 
-            TicTacToeMove move = new TicTacToeMove(row, col, gameState.getCurrentPlayer());
+            TicTacToeMove move = new TicTacToeMove(row, col, state.getCurrentPlayer());
 
-            if (gameState.getValidMoves().contains(move)) {
-                gameState.applyMove(move);
+            if (state.getValidMoves().contains(move)) {
+                state.applyMove(move);
                 validMove = true;
                 System.out.println("You played: " + move);
             } else {
@@ -90,14 +98,14 @@ public class TicTacToeGame implements Game{
 
     private void aiMove() {
         System.out.println("AI is thinking...");
-        boolean aiIsMaximizing = gameState.getCurrentPlayer() == X_PLAYER;
-        TicTacToeMove bestMove = minimax.getBestMove(gameState, aiIsMaximizing);
+        boolean aiIsMaximizing = state.getCurrentPlayer() == X_PLAYER;
+        TicTacToeMove bestMove = minimax.getBestMove(state, aiIsMaximizing);
         System.out.println("AI plays: " + bestMove);
-        gameState.applyMove(bestMove);
+        state.applyMove(bestMove);
     }
 
     private void printResult() {
-        int winner = gameState.getWinner();
+        int winner = state.getWinner();
         if (winner == 0) {
             System.out.println("Game over! It's a draw!");
         } else {
@@ -107,9 +115,138 @@ public class TicTacToeGame implements Game{
         }
     }
 
+    private void printDemoResult() {
+        int winner = state.getWinner();
+        if (winner == 0) {
+            System.out.println("Game over! It's a draw!");
+        } else {
+            char victorChar = (winner==X_PLAYER)? 'X' : 'Y';
+            System.out.println("The winner is " + victorChar);
+        }
+    }
+
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
 
+    private static boolean pickTicTacToePlayerChar() {
+        String input;
+        boolean playerIsX = false;
+        while (true) {
+            System.out.print("Do you want to play as X (goes first) or O (goes second)? ");
+            input = scanner.nextLine().toUpperCase();
+            if (input.equals("X")) {
+                playerIsX = true;
+                break;
+            } else if (input.equals("O")) {
+                playerIsX = false;
+                break;
+            } else {
+                System.out.println("Invalid input. Please enter X or O.");
+            }
+        }
+        return playerIsX;
+    }
+
+    private static int pickDepth() {
+        int depth = 5;
+        System.out.printf("Enter minimax depth (default %d).\n", depth);
+        String input = scanner.nextLine();
+        try {
+            depth = Integer.parseInt(input);
+
+        } catch (NumberFormatException e) {
+            System.out.printf("Invalid integer, using default depth: %d\n", depth);
+        }
+        return depth;
+    }
+
+    private static int pickAIType(String aiName) {
+        System.out.println("Select a type for " + aiName);
+        System.out.println("1. depth limited alpha beta pruned minimax");
+        System.out.println("2. complete alpha beta pruned minimax");
+        System.out.println("3. depth limited minimax");
+        System.out.println("4. complete minimax");
+        System.out.println("5. random moves");
+        while (true) {
+            try {
+                Scanner scanner = new Scanner(System.in);
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice < 6 & choice > 0) {
+                    return choice - 1;
+                }
+                System.out.println("Invalid Selection, input a number 1-5");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid Selection, input a number 1-5");
+            }
+
+        }
+    }
+
+    private void playDemoTurn(Minimax<TicTacToeMove, TicTacToeGameState> m, boolean random) {
+        System.out.println("AI is thinking...");
+
+        if (random) {
+            TicTacToeMove move = m.getRandomMove(state);
+            System.out.println("AI plays: " + move);
+            state.applyMove(move);
+
+        } else {
+            boolean aiIsMaximizing = state.getCurrentPlayer() == X_PLAYER;
+            TicTacToeMove move = m.getBestMove(state, aiIsMaximizing);
+            System.out.println("AI plays: " + move);
+            state.applyMove(move);
+
+        }
+
+    }
+
+    public void demo() {
+        Minimax<TicTacToeMove, TicTacToeGameState> xAi;
+        Minimax<TicTacToeMove, TicTacToeGameState> oAi;
+
+        // pick ai 1
+        int xAiType = pickAIType("X");
+        if (xAiType == Minimax.AB_LIMITED || xAiType == Minimax.MINIMAXLIMITED) {
+            int xDifficulty = pickDepth();
+            xAi = new Minimax<>(xAiType, xDifficulty);
+        } else if (xAiType == 5) {
+            xAi = new Minimax<>(0);
+        } else {
+            xAi = new Minimax<>(xAiType);
+        }
+
+        // pick ai 2
+        int oAiType = pickAIType("O");
+        if (oAiType == Minimax.AB_LIMITED || oAiType == Minimax.MINIMAXLIMITED) {
+            int oDifficulty = pickDepth();
+            oAi = new Minimax<>(oAiType);
+        } else {
+            oAi = new Minimax<>(xAiType);
+        }
+
+        state.displayGameState();
+        // play game
+        while (true) {
+            if (state.isTerminal()) {
+                break;
+            }
+            playDemoTurn(xAi, false);
+            state.displayGameState();
+
+            if (state.isTerminal()) {
+                break;
+            }
+            playDemoTurn(oAi, false);
+            state.displayGameState();
+        }
+        System.out.println("The Game is over");
+        printDemoResult();
+    }
+
+    public static void main(String[] args) {
+        Game game = new TicTacToeGame();
+        game.demo();
+    }
 }

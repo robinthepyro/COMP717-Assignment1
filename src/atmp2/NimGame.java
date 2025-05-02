@@ -192,4 +192,16 @@ public class NimGame implements Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
+
+    public static void main(String[] args) {
+        NimGame g = new NimGame(1);
+        g.run();
+    }
+
+	@Override
+	public void demo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'demo'");
+	}
+
 }

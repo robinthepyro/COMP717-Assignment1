@@ -327,21 +327,28 @@ public class TigerRewriteGame implements Game {
                     System.out.println("Invalid Selection, enter one of the following [t|d|R]");
             }
         }
-        int depth = 5;
+        int depth = -1;
         System.out.printf("Enter minimax depth (default %d).\n", depth);
         String input = scanner.nextLine();
         try {
             depth = Integer.parseInt(input);
 
         } catch (NumberFormatException e) {
+            depth = 5;
             System.out.printf("Invalid integer, using depth = %d\n", depth);
         }
         this.minimax = new Minimax<>(depth, mode);
     }
 
     public static void main(String[] args) {
-        TigerRewriteGame g = new TigerRewriteGame(Minimax.MINIMAXLIMITED);
+        TigerRewriteGame g = new TigerRewriteGame(Minimax.ABCOMPLETE);
         g.run();
 
     }
+
+	@Override
+	public void demo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'demo'");
+	}
 }
