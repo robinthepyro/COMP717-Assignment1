@@ -220,6 +220,13 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
     @Override
     public List<TigerVsDogsMove> getOptimisedValidMoves() {
         List<TigerVsDogsMove> ret = getValidMoves();
+        // this stupid hack is load bearing :(
+        for (TigerVsDogsMove move: ret){
+            applyMove(move);
+            move.setPriority(getEmptyAdjacent(getTigerPos()).size());
+            undoMove(move);
+        }
+        ret.sort(Comparator.comparingInt(TigerVsDogsMove::sortBy));
         return ret;
     }
 
@@ -280,7 +287,7 @@ public class TigerGameStateRewrite implements GameState<TigerVsDogsMove> {
                 // this is a kinda arbitrary way of evaluating positions but it WORKS
                 // due to the complexity of the game trees in TVD a good heuristic is
                 // key and I think I stumbled on a really really good one
-                return numEaten * 2 - getEmptyAdjacent(getTigerPos()).size();
+                return numEaten * 7 - getEmptyAdjacent(getTigerPos()).size();
 
             }
         }
