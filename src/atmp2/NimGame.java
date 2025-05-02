@@ -34,7 +34,11 @@ public class NimGame implements Game {
         NimGameState state = new NimGameState(playerTurn);
 
         // Get Minimax depth from the user
-        int depth = getMinimaxDepth();
+        int depth = -1;
+        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAXLIMITED) {
+            System.out.println(mode);
+            depth = getMinimaxDepth();
+        }
         minimax = new Minimax<>(depth, mode);
 
         return state;
