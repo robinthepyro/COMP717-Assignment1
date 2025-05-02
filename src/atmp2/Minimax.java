@@ -31,7 +31,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
 
         for (M move : state.getOptimisedValidMoves()) {
             state.applyMove(move);
-            int score = minimax(state, 1, !maximizing, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            int score = abLimited(state, 1, !maximizing, Integer.MIN_VALUE, Integer.MAX_VALUE);
             state.undoMove(move);
 
             if ((maximizing && score > bestScore) || (!maximizing && score < bestScore) || bestMove == null) {
@@ -44,7 +44,8 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         return bestMove;
     }
 
-    private int minimax(GameState<M> state, int depth, boolean maximizing, int alpha, int beta) {
+    private int abLimited(GameState<M> state, int depth, boolean maximizing, int alpha, int beta) {
+
         nodesEvaluated++;
 
         if (state.isTerminal() || depth >= maxDepth) {
@@ -55,7 +56,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
 
         for (M move : state.getOptimisedValidMoves()) {
             state.applyMove(move);
-            int score = minimax(state, depth + 1, !maximizing, alpha, beta);
+            int score = abLimited(state, depth + 1, !maximizing, alpha, beta);
             state.undoMove(move);
 
             if (maximizing) {
@@ -66,7 +67,89 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
                 beta = Math.min(beta, best);
             }
 
-            if (beta <= alpha) break;
+            if (beta <= alpha)
+                break;
+        }
+
+        return best;
+    }
+
+    private int abComplete(GameState<M> state, int depth, boolean maximizing, int alpha, int beta) {
+
+        nodesEvaluated++;
+
+        if (state.isTerminal()) {
+            return state.evaluate();
+        }
+
+        int best = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        for (M move : state.getOptimisedValidMoves()) {
+            state.applyMove(move);
+            int score = abComplete(state, depth + 1, !maximizing, alpha, beta);
+            state.undoMove(move);
+
+            if (maximizing) {
+                best = Math.max(best, score);
+                alpha = Math.max(alpha, best);
+            } else {
+                best = Math.min(best, score);
+                beta = Math.min(beta, best);
+            }
+
+            if (beta <= alpha)
+                break;
+        }
+
+        return best;
+
+    }
+
+    private int minimaxLimited(GameState<M> state, int depth, boolean maximizing) {
+        nodesEvaluated++;
+
+        if (state.isTerminal()) {
+            return state.evaluate();
+        }
+
+        int best = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        for (M move : state.getOptimisedValidMoves()) {
+            state.applyMove(move);
+            int score = minimaxLimited(state, depth + 1, !maximizing);
+            state.undoMove(move);
+
+            if (maximizing) {
+                best = Math.max(best, score);
+            } else {
+                best = Math.min(best, score);
+            }
+
+        }
+
+        return best;
+    }
+
+    private int minimaxComplete(GameState<M> state, int depth, boolean maximizing, int alpha, int beta) {
+        nodesEvaluated++;
+
+        if (state.isTerminal()) {
+            return state.evaluate();
+        }
+
+        int best = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        for (M move : state.getOptimisedValidMoves()) {
+            state.applyMove(move);
+            int score = minimaxComplete(state, depth + 1, !maximizing, alpha, beta);
+            state.undoMove(move);
+
+            if (maximizing) {
+                best = Math.max(best, score);
+            } else {
+                best = Math.min(best, score);
+            }
+
         }
 
         return best;
