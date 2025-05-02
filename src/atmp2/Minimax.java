@@ -33,10 +33,10 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
 
     private void init(){
         if (mode == MINIMAXLIMITED | mode == AB_LIMITED){
-            depthLimited = true;
+            limited = true;
         }
         else{
-            depthLimited = false;
+            limited = false;
         }
         if (mode == AB_LIMITED | mode == ABCOMPLETE){
             ab=true;

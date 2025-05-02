@@ -340,7 +340,7 @@ public class TigerRewriteGame implements Game {
     }
 
     public static void main(String[] args) {
-        TigerRewriteGame g = new TigerRewriteGame(Minimax.AB_LIMITED);
+        TigerRewriteGame g = new TigerRewriteGame(Minimax.MINIMAXLIMITED);
         g.run();
 
     }
