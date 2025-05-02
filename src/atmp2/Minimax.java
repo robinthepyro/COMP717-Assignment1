@@ -21,9 +21,9 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         init();
     }
 
-    public Minimax(int mode){
+    public Minimax(int mode) {
         // sanity check my code
-        if (mode > RANDOM | mode < AB_LIMITED){
+        if (mode > RANDOM | mode < AB_LIMITED) {
             System.err.println("You Should Not Be Doing that. Do better <3");
             System.out.println("Listen to this song and think about what you have done");
             throw new IllegalArgumentException("https://open.spotify.com/track/3gq0rDxpS9e6sbO72PBWbn");
@@ -32,22 +32,18 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         init();
     }
 
-    private void init(){
-        if (mode == MINIMAXLIMITED | mode == AB_LIMITED){
+    private void init() {
+        if (mode == MINIMAXLIMITED | mode == AB_LIMITED) {
             limited = true;
-        }
-        else{
+        } else {
             limited = false;
         }
-        if (mode == AB_LIMITED | mode == ABCOMPLETE){
-            ab=true;
+        if (mode == AB_LIMITED | mode == ABCOMPLETE) {
+            ab = true;
+        } else {
+            ab = false;
         }
-        else {
-            ab=false;
-        }
-      
     }
-
 
     public M getRandomMove(S state) {
         if (!state.isTerminal()) {
@@ -66,7 +62,7 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         // stupid way to make minimax play random moves
         // yeah, we have stupid mode
         // yeah, it makes the ai stupid
-        if (mode == RANDOM){
+        if (mode == RANDOM) {
             return getRandomMove(state);
         }
         // GameState<M> clonedState = state.clone();
@@ -98,9 +94,8 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
             if (state.isTerminal() || depth >= maxDepth) {
                 return state.evaluate();
             }
-        }
-        else {
-            if (state.isTerminal()){
+        } else {
+            if (state.isTerminal()) {
                 return state.evaluate();
             }
         }
@@ -121,10 +116,8 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
             if (ab) {
                 if (beta <= alpha)
                     break;
-
             }
         }
-
         return best;
     }
 }

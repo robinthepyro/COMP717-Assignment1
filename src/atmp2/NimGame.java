@@ -19,7 +19,11 @@ public class NimGame implements Game {
         this.mode = mode;
     }
 
-    @Override
+    public NimGame() {
+		//TODO Auto-generated constructor stub
+	}
+
+	@Override
     public void run() {
         System.out.println("Welcome to Misère Nim!");
         NimGameState state = initializeGame();
@@ -133,7 +137,8 @@ public class NimGame implements Game {
             clearScreen();
         }
 
-        System.out.println("\n╔══════════════════════════════════════════════════════╗");
+        System.out.println();
+        System.out.println("╔══════════════════════════════════════════════════════╗");
         System.out.println("║                      MISERE NIM                      ║");
         System.out.println("╚══════════════════════════════════════════════════════╝");
 

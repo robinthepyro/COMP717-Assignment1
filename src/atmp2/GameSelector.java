@@ -15,43 +15,75 @@ public class GameSelector {
         boolean play = true;
         boolean humanVsAi = playerVsAi();
         while (play) {
-            System.out.println("Choose a game to play:");
+            System.out.println("Choose a game to " + (humanVsAi ? "play" : "demo"));
             System.out.println("1. Tic Tac Toe");
             System.out.println("2. Nim Game");
             System.out.println("3. Coin Game");
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
             int choice = getGameChoice();
-            int mode = pickMinimaxMode();
-            switch (choice) {
-                case 1:
-                    // Setup for Tic Tac Toe
-                    Game game = new TicTacToeGame(mode);
-                    game.run();
-                    break;
-                case 2:
-                    // Setup for Nim Game
-                    game = new NimGame(mode);
-                    game.run();
-                    break;
-                case 3:
-                    game = new CoinGame(mode);
-                    game.run();
-                    break;
-                case 4:
-                    game = new TigerRewriteGame(mode);
-                    game.run();
-                    break;
-                case 5:
-                    System.out.println("Exiting...");
-                    scanner.close();
-                    return; // Exit the program
-                default:
-                    System.out.println("Invalid choice. Please select a valid game.");
-                    break;
-            }
-            play = playAgain();
 
+            // pve mode
+            if (humanVsAi) {
+                int mode = pickMinimaxMode();
+                switch (choice) {
+                    case 1:
+                        // Setup for Tic Tac Toe
+                        Game game = new TicTacToeGame(mode);
+                        game.run();
+                        break;
+                    case 2:
+                        // Setup for Nim Game
+                        game = new NimGame(mode);
+                        game.run();
+                        break;
+                    case 3:
+                        game = new CoinGame(mode);
+                        game.run();
+                        break;
+                    case 4:
+                        game = new TigerRewriteGame(mode);
+                        game.run();
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        scanner.close();
+                        return; // Exit the program
+                    default:
+                        System.out.println("Invalid choice. Please select a valid game.");
+                        break;
+                }
+            } else {
+
+                switch (choice) {
+                    case 1:
+                        // Setup for Tic Tac Toe
+                        Game game = new TicTacToeGame();
+                        game.demo();
+                        break;
+                    case 2:
+                        // Setup for Nim Game
+                        game = new NimGame();
+                        game.demo();
+                        break;
+                    case 3:
+                        game = new CoinGame();
+                        game.demo();
+                        break;
+                    case 4:
+                        game = new TigerRewriteGame();
+                        game.demo();
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        scanner.close();
+                        return; // Exit the program
+                    default:
+                        System.out.println("Invalid choice. Please select a valid game.");
+                        break;
+                }
+                play = playAgain();
+            }
         }
     }
 
@@ -117,8 +149,6 @@ public class GameSelector {
             }
         }
     }
-
-    
 
     private static int pickMinimaxMode() {
         while (true) {

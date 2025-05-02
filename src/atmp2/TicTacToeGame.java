@@ -116,6 +116,7 @@ public class TicTacToeGame implements Game {
     }
 
     private void printDemoResult() {
+        // dumb workaround cus printResult assumes human
         int winner = state.getWinner();
         if (winner == 0) {
             System.out.println("Game over! It's a draw!");

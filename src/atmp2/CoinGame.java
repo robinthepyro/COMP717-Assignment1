@@ -15,6 +15,10 @@ public class CoinGame implements Game {
         this.mode = mode;
     }
 
+    // constructor for demo mode yes it does nothing
+    public CoinGame() {
+    }
+
     @Override
     public void run() {
         System.out.println("Welcome to the Coin Game");
@@ -129,9 +133,9 @@ public class CoinGame implements Game {
         System.out.println("Will you pick from the left or right? (l/r)");
     }
 
-	@Override
-	public void demo() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'demo'");
-	}
+    @Override
+    public void demo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'demo'");
+    }
 }

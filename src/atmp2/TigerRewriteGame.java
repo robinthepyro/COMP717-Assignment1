@@ -47,7 +47,11 @@ public class TigerRewriteGame implements Game {
         this.mode = mode;
     }
 
-    public void test() {
+    public TigerRewriteGame() {
+		//TODO Auto-generated constructor stub
+	}
+
+	public void test() {
         setup();
     }
 
