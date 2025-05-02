@@ -94,6 +94,11 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
                 return state.evaluate();
             }
         }
+        else {
+            if (state.isTerminal()){
+                return state.evaluate();
+            }
+        }
         int best = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         for (M move : state.getOptimisedValidMoves()) {
             state.applyMove(move);
