@@ -10,10 +10,12 @@ public class TicTacToeGame implements Game{
     private final Minimax<TicTacToeMove, TicTacToeGameState> minimax;
     private final Scanner scanner;
     private final boolean playerIsX;
+    int mode;
 
-    public TicTacToeGame(boolean playerIsX, int maxDepth) {
+    public TicTacToeGame(boolean playerIsX, int maxDepth, int mode) {
+        this.mode = mode;
         this.gameState = new TicTacToeGameState();
-        this.minimax = new Minimax<>(maxDepth);
+        this.minimax = new Minimax<>(maxDepth, mode);
         this.scanner = new Scanner(System.in); // keep internal Scanner
         this.playerIsX = playerIsX;
     }

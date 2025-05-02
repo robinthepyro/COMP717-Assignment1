@@ -2,10 +2,17 @@ package atmp2;
 
 import java.util.Scanner;
 
+import atmp2.Minimax;
+
 public class CoinGame implements Game{
     private final Scanner scanner = new Scanner(System.in);
     private Minimax<CoinGameMove, CoinGameState> minmax;
     private MemoryTracker memoryTracker = new MemoryTracker();
+    private int mode;
+
+    public CoinGame(int mode){
+        this.mode = mode;
+    }
 
     @Override
     public void run() {
@@ -22,7 +29,7 @@ public class CoinGame implements Game{
         CoinGameState state = new CoinGameState(chosenStartPlayer, 20);
 
         int minmaxDepth = getMinMaxDepth();
-        minmax = new Minimax<>(minmaxDepth);
+        minmax = new Minimax<>(minmaxDepth, mode);
 
         return state;
     }
@@ -102,7 +109,7 @@ public class CoinGame implements Game{
     }
 
     public static void main(String[] args) {
-        CoinGame game = new CoinGame();
+        CoinGame game = new CoinGame(Minimax.AB_LIMITED);
         game.run();
     }
 

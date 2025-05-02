@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Stack;
 
+import atmp2.Minimax;
 import atmp2.TigerGameStateRewrite;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class TigerRewriteGame implements Game {
     public Scanner scanner = new Scanner(System.in);
     public Random rand = new Random();
     boolean humanPlaysAsTiger;
+    int mode;
     private static Map<Character, Integer> directionKeyMap = Map.of(
             'Q', 1, 'W', 2, 'E', 3,
             'A', 4, 'D', 5,
@@ -40,8 +42,9 @@ public class TigerRewriteGame implements Game {
             8, new Coord(1, 1) // down-right
     );
 
-    public TigerRewriteGame() {
+    public TigerRewriteGame(int mode) {
         state = new TigerGameStateRewrite();
+        this.mode = mode;
     }
 
     public void test() {
@@ -333,11 +336,11 @@ public class TigerRewriteGame implements Game {
         } catch (NumberFormatException e) {
             System.out.printf("Invalid integer, using depth = %d\n", depth);
         }
-        this.minimax = new Minimax<>(depth);
+        this.minimax = new Minimax<>(depth, mode);
     }
 
     public static void main(String[] args) {
-        TigerRewriteGame g = new TigerRewriteGame();
+        TigerRewriteGame g = new TigerRewriteGame(Minimax.AB_LIMITED);
         g.run();
 
     }

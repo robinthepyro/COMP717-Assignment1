@@ -6,13 +6,18 @@ import atmp2.NimGameState;
 
 import java.util.List;
 
-public class NimGame implements Game{
+public class NimGame implements Game {
     // Constants for Player types
     public static final int AI_PLAYER = 1;
     public static final int HUMAN_PLAYER = 2;
+    private int mode;
 
     private static final Scanner scanner = new Scanner(System.in);
     private static Minimax<NimMove, NimGameState> minimax;
+
+    public NimGame(int mode) {
+        this.mode = mode;
+    }
 
     @Override
     public void run() {
@@ -21,7 +26,7 @@ public class NimGame implements Game{
         playGame(state);
     }
 
-    private static NimGameState initializeGame() {
+    private NimGameState initializeGame() {
         // Player choice for first turn
         boolean playerTurn = getPlayerChoice();
 
@@ -30,7 +35,7 @@ public class NimGame implements Game{
 
         // Get Minimax depth from the user
         int depth = getMinimaxDepth();
-        minimax = new Minimax<>(depth);
+        minimax = new Minimax<>(depth, mode);
 
         return state;
     }
@@ -112,67 +117,67 @@ public class NimGame implements Game{
         }
     }
 
-/**
- * Displays the current Misere Nim game state with piles shown vertically.
- * Each pile is represented as a column of tokens.
- * 
- * @param state The current game state
- * @param clear Whether to clear the screen before displaying
- */
-private static void displayGameState(NimGameState state, boolean clear) {
-    if (clear) {
-        clearScreen();
-    }
-    
-    System.out.println("\n╔══════════════════════════════════════════════════════╗");
-    System.out.println("║                      MISERE NIM                      ║");
-    System.out.println("╚══════════════════════════════════════════════════════╝");
-    
-    // Get the piles array
-    int[] piles = state.getPiles();
-    
-    // Find the maximum pile size to determine height of display
-    int maxPileSize = 0;
-    for (int pile : piles) {
-        if (pile > maxPileSize) {
-            maxPileSize = pile;
+    /**
+     * Displays the current Misere Nim game state with piles shown vertically.
+     * Each pile is represented as a column of tokens.
+     * 
+     * @param state The current game state
+     * @param clear Whether to clear the screen before displaying
+     */
+    private static void displayGameState(NimGameState state, boolean clear) {
+        if (clear) {
+            clearScreen();
         }
-    }
-    
-    // Display pile headers with numbers
-    System.out.println();
-    for (int i = 0; i < piles.length; i++) {
-        System.out.printf("Pile %-3d", i + 1);
-    }
-    System.out.println();
-    
-    // Display pile sizes
-    for (int i = 0; i < piles.length; i++) {
-        System.out.printf(" (%d)    ", piles[i]);
-    }
-    System.out.println("\n");
-    
-    // Display the tokens in each pile vertically
-    for (int row = maxPileSize; row > 0; row--) {
-        for (int col = 0; col < piles.length; col++) {
-            // Display a token if the pile height reaches this row
-            if (piles[col] >= row) {
-                System.out.print("  ●     ");
-            } else {
-                System.out.print("        ");
+
+        System.out.println("\n╔══════════════════════════════════════════════════════╗");
+        System.out.println("║                      MISERE NIM                      ║");
+        System.out.println("╚══════════════════════════════════════════════════════╝");
+
+        // Get the piles array
+        int[] piles = state.getPiles();
+
+        // Find the maximum pile size to determine height of display
+        int maxPileSize = 0;
+        for (int pile : piles) {
+            if (pile > maxPileSize) {
+                maxPileSize = pile;
             }
         }
+
+        // Display pile headers with numbers
         System.out.println();
-    }
-    
-    // Display base line for visual clarity
-    System.out.print("▀▀▀▀▀▀▀▀");
-    for (int i = 1; i < piles.length; i++) {
+        for (int i = 0; i < piles.length; i++) {
+            System.out.printf("Pile %-3d", i + 1);
+        }
+        System.out.println();
+
+        // Display pile sizes
+        for (int i = 0; i < piles.length; i++) {
+            System.out.printf(" (%d)    ", piles[i]);
+        }
+        System.out.println("\n");
+
+        // Display the tokens in each pile vertically
+        for (int row = maxPileSize; row > 0; row--) {
+            for (int col = 0; col < piles.length; col++) {
+                // Display a token if the pile height reaches this row
+                if (piles[col] >= row) {
+                    System.out.print("  ●     ");
+                } else {
+                    System.out.print("        ");
+                }
+            }
+            System.out.println();
+        }
+
+        // Display base line for visual clarity
         System.out.print("▀▀▀▀▀▀▀▀");
+        for (int i = 1; i < piles.length; i++) {
+            System.out.print("▀▀▀▀▀▀▀▀");
+        }
+        System.out.println("\n");
     }
-    System.out.println("\n");
-}
-    
+
     private static void displayGameState(NimGameState state) {
         // I LOOOOVE METHOD OVERLOADING
         // default to clearing screen

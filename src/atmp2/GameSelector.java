@@ -9,6 +9,7 @@ import atmp2.TigerRewriteGame;
 public class GameSelector {
     private static Scanner scanner = new Scanner(System.in);
     private Game game;
+
     public static void main(String[] args) {
         System.out.println("Welcome to the Game Selector!");
         boolean play = true;
@@ -20,31 +21,32 @@ public class GameSelector {
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
             int choice = getGameChoice();
+            int mode = pickMode();
             switch (choice) {
                 case 1:
                     // Setup for Tic Tac Toe
                     boolean playerIsX = pickTicTacToePlayerChar();
                     int difficulty = pickTicTacToeDifficulty();
-                    Game game = new TicTacToeGame(playerIsX, difficulty);
+                    Game game = new TicTacToeGame(playerIsX, difficulty, mode);
                     game.run();
                     break;
                 case 2:
                     // Setup for Nim Game
-                    game = new NimGame();
+                    game = new NimGame(mode);
                     game.run();
                     break;
                 case 3:
-                    game = new CoinGame();
+                    game = new CoinGame(mode);
                     game.run();
                     break;
                 case 4:
-                    game = new TigerRewriteGame();
+                    game = new TigerRewriteGame(mode);
                     game.run();
                     break;
                 case 5:
                     System.out.println("Exiting...");
                     scanner.close();
-                    return;  // Exit the program
+                    return; // Exit the program
                 default:
                     System.out.println("Invalid choice. Please select a valid game.");
                     break;
@@ -54,20 +56,19 @@ public class GameSelector {
         }
     }
 
-    public static boolean playAgain(){
+    public static boolean playAgain() {
         boolean valid = false;
         boolean choice = false;
         String input = "";
-        while(!valid){
+        while (!valid) {
             System.out.println("Play Another Game? [y|N]");
             input = scanner.nextLine();
             input = input.toLowerCase();
 
-            if (input.length() == 0){
+            if (input.length() == 0) {
                 return false;
-            }
-            else {
-                switch(input.charAt(0)){
+            } else {
+                switch (input.charAt(0)) {
                     case 'y':
                         return true;
                     case 'n':
@@ -95,7 +96,7 @@ public class GameSelector {
         return choice;
     }
 
-    private static void test(){
+    private static void test() {
         System.out.println(playAgain());
     }
 
@@ -132,5 +133,31 @@ public class GameSelector {
             }
         }
         return difficulty;
+    }
+
+    private static int pickMode() {
+        while (true) {
+            // int ABLIMITED = 0;
+            // int ABCOMPLETE = 1;
+            // int MINIMAXLIMITED = 2;
+            // int MINIMAXCOMPLETE = 3;
+
+            System.out.println("Select a mode");
+            System.out.println("1. depth limited alpha beta pruned minimax");
+            System.out.println("2. complete alpha beta pruned minimax");
+            System.out.println("3. depth limited minimax");
+            System.out.println("4. complete minimax");
+
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice > 0 && choice < 5) {
+                    return choice;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid Selection");
+            }
+
+        }
+
     }
 }
