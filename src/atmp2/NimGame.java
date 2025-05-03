@@ -207,7 +207,7 @@ public class NimGame implements Game {
         g.demo();
     }
 
-    private static int pickAIType(String aiName) {
+    public static int pickAIType(String aiName) {
         System.out.println("Select a type for " + aiName);
         System.out.println("1. depth limited alpha beta pruned minimax");
         System.out.println("2. complete alpha beta pruned minimax");
@@ -245,7 +245,7 @@ public class NimGame implements Game {
         Minimax<NimMove, NimGameState> secondAI;
 
         // pick ai 1
-        int firstAIType = pickAIType("X");
+        int firstAIType = pickAIType("first ai");
         if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAXLIMITED) {
             // TODO fix the smell here
             // ugly ugly code, needs a refactor
@@ -256,7 +256,7 @@ public class NimGame implements Game {
         }
 
         // pick ai 2
-        int secondAITYpe = pickAIType("O");
+        int secondAITYpe = pickAIType("second ai");
         if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAXLIMITED) {
             // TODO fix the smell here
             // ugly ugly code, needs a refactor
