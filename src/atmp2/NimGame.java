@@ -11,6 +11,8 @@ public class NimGame implements Game {
     public static final int AI_PLAYER = 1;
     public static final int HUMAN_PLAYER = 2;
     private int mode;
+    private NimGameState state;
+    private boolean demoOddTurn;
 
     private static final Scanner scanner = new Scanner(System.in);
     private static Minimax<NimMove, NimGameState> minimax;
@@ -19,11 +21,13 @@ public class NimGame implements Game {
         this.mode = mode;
     }
 
+    // constructor for demo mode
     public NimGame() {
-		//TODO Auto-generated constructor stub
-	}
+        this.demoOddTurn = true;
+        this.state = new NimGameState();
+    }
 
-	@Override
+    @Override
     public void run() {
         System.out.println("Welcome to Misère Nim!");
         NimGameState state = initializeGame();
@@ -199,14 +203,92 @@ public class NimGame implements Game {
     }
 
     public static void main(String[] args) {
-        NimGame g = new NimGame(1);
-        g.run();
+        NimGame g = new NimGame();
+        g.demo();
     }
 
-	@Override
-	public void demo() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'demo'");
-	}
+    private static int pickAIType(String aiName) {
+        System.out.println("Select a type for " + aiName);
+        System.out.println("1. depth limited alpha beta pruned minimax");
+        System.out.println("2. complete alpha beta pruned minimax");
+        System.out.println("3. depth limited minimax");
+        System.out.println("4. complete minimax");
+        System.out.println("5. random moves");
+        while (true) {
+            try {
+                Scanner scanner = new Scanner(System.in);
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice < 6 & choice > 0) {
+                    return choice - 1;
+                }
+                System.out.println("Invalid Selection, input a number 1-5");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid Selection, input a number 1-5");
+            }
+
+        }
+    }
+
+    private void playDemoTurn(Minimax<NimMove, NimGameState> m) {
+        System.out.println("AI is thinking...");
+        // TODO fix the fact that one of the ai players has to be considered a HUMAN
+        // player.
+        boolean aiIsMaximizing = state.getPlayer() == NimGameState.AI_PLAYER;
+        NimMove move = m.getBestMove(state, aiIsMaximizing);
+        System.out.println("AI plays: " + move);
+        state.applyMove(move);
+    }
+
+    @Override
+    public void demo() {
+        Minimax<NimMove, NimGameState> firstAI;
+        Minimax<NimMove, NimGameState> secondAI;
+
+        // pick ai 1
+        int firstAIType = pickAIType("X");
+        if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAXLIMITED) {
+            // TODO fix the smell here
+            // ugly ugly code, needs a refactor
+            int xDifficulty = TicTacToeGame.pickDepth();
+            firstAI = new Minimax<>(firstAIType, xDifficulty);
+        } else {
+            firstAI = new Minimax<>(firstAIType);
+        }
+
+        // pick ai 2
+        int secondAITYpe = pickAIType("O");
+        if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAXLIMITED) {
+            // TODO fix the smell here
+            // ugly ugly code, needs a refactor
+            int oDifficulty = TicTacToeGame.pickDepth();
+            secondAI = new Minimax<>(secondAITYpe);
+        } else {
+            secondAI = new Minimax<>(firstAIType);
+        }
+
+        displayGameState(state);
+
+        // stupid workaround to make demoturn be flipped at start of game loop
+        // but must start true so we gotta set it false first
+        demoOddTurn = false;
+        // play game
+        while (true) {
+            demoOddTurn = !demoOddTurn;
+
+            if (demoOddTurn){
+                playDemoTurn(firstAI);;
+            }
+            else {
+                playDemoTurn(secondAI);;
+            }
+            
+            if (state.isTerminal()) {
+                break;
+            }
+        }
+        displayGameState(state);
+        System.out.println("The Game is over");
+        System.out.println("The winner is "+ ((demoOddTurn)?"Player 1":"Player 2"));
+    }
 
 }

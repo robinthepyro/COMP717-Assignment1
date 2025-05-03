@@ -121,7 +121,7 @@ public class TicTacToeGame implements Game {
         if (winner == 0) {
             System.out.println("Game over! It's a draw!");
         } else {
-            char victorChar = (winner==X_PLAYER)? 'X' : 'Y';
+            char victorChar = (winner==X_PLAYER)? 'X' : 'O';
             System.out.println("The winner is " + victorChar);
         }
     }
@@ -150,7 +150,7 @@ public class TicTacToeGame implements Game {
         return playerIsX;
     }
 
-    private static int pickDepth() {
+    public static int pickDepth() {
         int depth = 5;
         System.out.printf("Enter minimax depth (default %d).\n", depth);
         String input = scanner.nextLine();
@@ -187,20 +187,10 @@ public class TicTacToeGame implements Game {
 
     private void playDemoTurn(Minimax<TicTacToeMove, TicTacToeGameState> m, boolean random) {
         System.out.println("AI is thinking...");
-
-        if (random) {
-            TicTacToeMove move = m.getRandomMove(state);
-            System.out.println("AI plays: " + move);
-            state.applyMove(move);
-
-        } else {
             boolean aiIsMaximizing = state.getCurrentPlayer() == X_PLAYER;
             TicTacToeMove move = m.getBestMove(state, aiIsMaximizing);
             System.out.println("AI plays: " + move);
             state.applyMove(move);
-
-        }
-
     }
 
     public void demo() {

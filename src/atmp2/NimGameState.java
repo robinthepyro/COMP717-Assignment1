@@ -3,8 +3,8 @@ package atmp2;
 import java.util.*;
 
 public class NimGameState implements GameState<NimMove> {
-    private static final int AI_PLAYER = 1;
-    private static final int HUMAN_PLAYER = 2;
+    public static final int AI_PLAYER = 1;
+    public static final int HUMAN_PLAYER = 2;
 
     private static final int[] defaultGameState = { 1, 3, 5, 7, 5, 3, 1 };
     // private static int[] defaultGameState = {10,10,10,10,10,10};
