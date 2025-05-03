@@ -233,7 +233,7 @@ public class NimGame implements Game {
         System.out.println("AI is thinking...");
         // TODO fix the fact that one of the ai players has to be considered a HUMAN
         // player.
-        boolean aiIsMaximizing = state.getPlayer() == NimGameState.AI_PLAYER;
+        boolean aiIsMaximizing = state.getPlayer() == NimGameState.HUMAN_PLAYER;
         NimMove move = m.getBestMove(state, aiIsMaximizing);
         System.out.println("AI plays: " + move);
         state.applyMove(move);
@@ -274,21 +274,28 @@ public class NimGame implements Game {
         // play game
         while (true) {
             demoOddTurn = !demoOddTurn;
+            displayGameState(state);
 
-            if (demoOddTurn){
-                playDemoTurn(firstAI);;
+            if (demoOddTurn) {
+                playDemoTurn(firstAI);
+                ;
+            } else {
+                playDemoTurn(secondAI);
+                ;
             }
-            else {
-                playDemoTurn(secondAI);;
-            }
-            
+
             if (state.isTerminal()) {
                 break;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
             }
         }
         displayGameState(state);
         System.out.println("The Game is over");
-        System.out.println("The winner is "+ ((demoOddTurn)?"Player 1":"Player 2"));
+        System.out.println("The winner is " + ((demoOddTurn) ? "Player 1" : "Player 2"));
     }
 
 }

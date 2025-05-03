@@ -22,7 +22,7 @@ public class TicTacToeGame implements Game {
     }
 
     // Demo mode constructor BE VERY CAREFUL!
-    public TicTacToeGame(){
+    public TicTacToeGame() {
         this.state = new TicTacToeGameState();
         this.playerIsX = true; // dunno why im defining this but compiler complains
     }
@@ -121,7 +121,7 @@ public class TicTacToeGame implements Game {
         if (winner == 0) {
             System.out.println("Game over! It's a draw!");
         } else {
-            char victorChar = (winner==X_PLAYER)? 'X' : 'O';
+            char victorChar = (winner == X_PLAYER) ? 'X' : 'O';
             System.out.println("The winner is " + victorChar);
         }
     }
@@ -187,10 +187,10 @@ public class TicTacToeGame implements Game {
 
     private void playDemoTurn(Minimax<TicTacToeMove, TicTacToeGameState> m, boolean random) {
         System.out.println("AI is thinking...");
-            boolean aiIsMaximizing = state.getCurrentPlayer() == X_PLAYER;
-            TicTacToeMove move = m.getBestMove(state, aiIsMaximizing);
-            System.out.println("AI plays: " + move);
-            state.applyMove(move);
+        boolean aiIsMaximizing = state.getCurrentPlayer() == X_PLAYER;
+        TicTacToeMove move = m.getBestMove(state, aiIsMaximizing);
+        System.out.println("AI plays: " + move);
+        state.applyMove(move);
     }
 
     public void demo() {
@@ -226,11 +226,21 @@ public class TicTacToeGame implements Game {
             playDemoTurn(xAi, false);
             state.displayGameState();
 
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             if (state.isTerminal()) {
                 break;
             }
             playDemoTurn(oAi, false);
             state.displayGameState();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
         }
         System.out.println("The Game is over");
         printDemoResult();

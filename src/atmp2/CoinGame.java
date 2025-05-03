@@ -167,11 +167,17 @@ public class CoinGame implements Game {
             } else {
                 playDemoTurn(secondAi);
             }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
         }
         displayState();
 
         System.out
-                .println("The winner is the " + ((state.getAiScore() < state.getPlayerScore()) ? "Seocnd AI" : "First AI"));
+                .println("The winner is the "
+                        + ((state.getAiScore() < state.getPlayerScore()) ? "Seocnd AI" : "First AI"));
         System.out.println("First AI " + state.getAiScore() + "Second AI:" + state.getPlayerScore());
 
     }

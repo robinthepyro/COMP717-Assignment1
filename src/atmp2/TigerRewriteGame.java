@@ -6,7 +6,10 @@ import java.util.InputMismatchException;
 import java.util.Stack;
 
 import atmp2.Minimax;
+import atmp2.NimGame;
+import atmp2.TicTacToeGame;
 import atmp2.TigerGameStateRewrite;
+import atmp2.TigerVsDogsMove;
 
 import java.util.List;
 import java.util.Map;
@@ -48,10 +51,10 @@ public class TigerRewriteGame implements Game {
     }
 
     public TigerRewriteGame() {
-		//TODO Auto-generated constructor stub
-	}
+        state = new TigerGameStateRewrite();
+    }
 
-	public void test() {
+    public void test() {
         setup();
     }
 
@@ -305,7 +308,7 @@ public class TigerRewriteGame implements Game {
         while (invalid) {
             System.out.println("Would you like to play as the tiger, dogs, or a random side [t|d|R]");
             String raw = scanner.nextLine();
-            if (raw.length() == 0){
+            if (raw.length() == 0) {
                 humanPlaysAsTiger = rand.nextBoolean();
                 break;
             }
@@ -345,14 +348,50 @@ public class TigerRewriteGame implements Game {
     }
 
     public static void main(String[] args) {
-        TigerRewriteGame g = new TigerRewriteGame(Minimax.ABCOMPLETE);
-        g.run();
+        TigerRewriteGame g = new TigerRewriteGame();
+        g.demo();
 
     }
 
-	@Override
-	public void demo() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'demo'");
-	}
+    @Override
+    public void demo() {
+        Minimax<TigerVsDogsMove, TigerGameStateRewrite> tigerAi;
+        Minimax<TigerVsDogsMove, TigerGameStateRewrite> dogAi;
+        // pick ai 1 type
+        int tigerAiType = NimGame.pickAIType("Tiger");
+        // set depth if relevant
+        if (tigerAiType == Minimax.AB_LIMITED | tigerAiType == Minimax.MINIMAXLIMITED) {
+            int depth = TicTacToeGame.pickDepth();
+            tigerAi = new Minimax<>(depth, tigerAiType);
+        } else {
+            tigerAi = new Minimax<>(tigerAiType);
+        }
+        // pick ai 2 type
+        int dogAiType = NimGame.pickAIType("Dogs");
+        // set depth if relevant
+        if (dogAiType == Minimax.AB_LIMITED | dogAiType == Minimax.MINIMAXLIMITED) {
+            int depth = TicTacToeGame.pickDepth();
+            dogAi = new Minimax<>(depth, dogAiType);
+        } else {
+            dogAi = new Minimax<>(dogAiType);
+        }
+        // run game loop
+        while (true) {
+            display(state);
+            if (state.isTerminal()) {
+                break;
+            }
+            if (state.tigerTurn) {
+                state.applyMove(tigerAi.getBestMove(state, true));
+            } else {
+                state.applyMove(dogAi.getBestMove(state, false));
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        // report result
+    }
 }
