@@ -2,6 +2,7 @@ package atmp2;
 
 import java.util.Scanner;
 
+import atmp2.MinimaxSetupHelper;
 import atmp2.NimGameState;
 
 import java.util.List;
@@ -244,23 +245,22 @@ public class NimGame implements Game {
         Minimax<NimMove, NimGameState> firstAI;
         Minimax<NimMove, NimGameState> secondAI;
 
+
         // pick ai 1
-        int firstAIType = pickAIType("first ai");
+        System.out.println("Pick Mode for First Player");
+        int firstAIType = MinimaxSetupHelper.pickAIType();
         if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
-            // TODO fix the smell here
-            // ugly ugly code, needs a refactor
-            int xDifficulty = TicTacToeGame.pickDepth();
+            int xDifficulty = MinimaxSetupHelper.pickDepth();
             firstAI = new Minimax<>(firstAIType, xDifficulty);
         } else {
             firstAI = new Minimax<>(firstAIType);
         }
 
         // pick ai 2
-        int secondAITYpe = pickAIType("second ai");
+        System.out.println("Pick Mode for Second Player");
+        int secondAITYpe = MinimaxSetupHelper.pickAIType();
         if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
-            // TODO fix the smell here
-            // ugly ugly code, needs a refactor
-            int oDifficulty = TicTacToeGame.pickDepth();
+            int oDifficulty = MinimaxSetupHelper.pickDepth();
             secondAI = new Minimax<>(secondAITYpe);
         } else {
             secondAI = new Minimax<>(firstAIType);
@@ -278,10 +278,8 @@ public class NimGame implements Game {
 
             if (demoOddTurn) {
                 playDemoTurn(firstAI);
-                ;
             } else {
                 playDemoTurn(secondAI);
-                ;
             }
 
             if (state.isTerminal()) {

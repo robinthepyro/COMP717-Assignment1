@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import atmp2.CoinGameState;
 import atmp2.Minimax;
+import atmp2.MinimaxSetupHelper;
 import atmp2.NimGame;
 
 public class CoinGame implements Game {
@@ -142,7 +143,7 @@ public class CoinGame implements Game {
         int firstAiType = NimGame.pickAIType("First Ai");
         Minimax<CoinGameMove, CoinGameState> secondAi;
         if (firstAiType == Minimax.AB_LIMITED || firstAiType == Minimax.MINIMAX_LIMITED) {
-            int firstDifficulty = TicTacToeGame.pickDepth();
+            int firstDifficulty = MinimaxSetupHelper.pickDepth();
             firstAi = new Minimax<>(firstDifficulty, firstAiType);
         } else {
             firstAi = new Minimax<>(firstAiType);
@@ -150,7 +151,7 @@ public class CoinGame implements Game {
 
         int secondAiType = NimGame.pickAIType("Second Ai");
         if (secondAiType == Minimax.AB_LIMITED || secondAiType == Minimax.MINIMAX_LIMITED) {
-            int secondDifficulty = TicTacToeGame.pickDepth();
+            int secondDifficulty = MinimaxSetupHelper.pickDepth();
             secondAi = new Minimax<>(secondDifficulty, secondAiType);
         } else {
             secondAi = new Minimax<>(secondAiType);

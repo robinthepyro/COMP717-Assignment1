@@ -23,13 +23,19 @@ public class TicTacToeGame implements Game {
     }
 
     // Demo mode constructor BE VERY CAREFUL!
+    // yes having a seperate constructor is fragile and dumb
     public TicTacToeGame() {
         this.state = new TicTacToeGameState();
-        this.playerIsX = true; // dunno why im defining this but compiler complains
+        this.playerIsX = true;
     }
 
     public void run() {
-        minimax = new Minimax<>(pickDepth(), minimaxMode);
+        if (minimaxMode == Minimax.AB_LIMITED | minimaxMode == Minimax.MINIMAX_LIMITED) {
+            minimax = new Minimax<>(MinimaxSetupHelper.pickDepth(), minimaxMode);
+        }
+        else {
+            minimax = new Minimax<>(minimaxMode);
+        }
         System.out.println("Welcome to Tic Tac Toe!");
         System.out.println("You are " + (playerIsX ? "X" : "O") + " and " +
                 (playerIsX ? "go first" : "go second"));
