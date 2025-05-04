@@ -1,28 +1,63 @@
 package atmp2;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Scanner;
-
-/**
- * TODO:
- * Allow making the game AI vs AI with a flag (this just disables prompts etc)
- */
 
 public class CoinGame implements Game {
     private final Scanner scanner = new Scanner(System.in);
-    private Minimax<CoinGameMove, CoinGameState> minmax;
-    private MemoryTracker memoryTracker = new MemoryTracker();
-    private CSVWriter<MemoryTracker> memoryTrackerCSVWriter;
-    private int mode;
-    private int playCount;
+    private Minimax<CoinGameMove, CoinGameState> aiMinMax;
+    private int aiMode;
     private int gameSize;
+    private WinTracker winTracker = new WinTracker();
+    private CSVWriter<WinTracker> winTrackerCSVWriter = new CSVWriter<>("coingame wins");
+
+    // Demo mode stuff
+    private boolean demoMode; // True when AI vs AI
+    private int demoPlayCount;
+    private int demoGameSize;
+    private int demoMinmaxDepth;
+    private int playerAiMode;
+    private Minimax<CoinGameMove, CoinGameState> playerAiMinMax;
+    private MemoryTracker aiMemoryTracker;
+    private CSVWriter<MemoryTracker> aiMemoryTrackerCSVWriter;
+    private DurationTracker aiDurationTracker;
+    private CSVWriter<DurationTracker> aiDurationTrackerCSVWriter;
+
+    private MemoryTracker playerAiMemoryTracker;
+    private CSVWriter<MemoryTracker> playerAiMemoryTrackerCSVWriter;
+    private DurationTracker playerAiDurationTracker;
+    private CSVWriter<DurationTracker> playerAiDurationTrackerCSVWriter;
+
+    public static void main(String[] args) {
+        CoinGame game = new CoinGame();
+        game.demo();
+    }
 
     public CoinGame(int mode) {
-        this.mode = mode;
+        this.aiMode = mode;
+        this.gameSize = 10;
+    }
 
-        this.memoryTrackerCSVWriter = new CSVWriter<>("coingame memory");
-        this.playCount = 3;
-        this.gameSize = 100;
+    // Constructor for demo mode
+    public CoinGame() {
+        this.demoGameSize = 100;
+        this.demoPlayCount = 500;
+        this.aiMode = Minimax.AB_LIMITED;
+        this.playerAiMode = Minimax.AB_LIMITED;
+        this.demoMinmaxDepth = 50;
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        this.aiMemoryTracker = new MemoryTracker();
+        this.aiMemoryTrackerCSVWriter = new CSVWriter<>("coingame ai memory", timestamp);
+        this.aiDurationTracker = new DurationTracker();
+        this.aiDurationTrackerCSVWriter = new CSVWriter<DurationTracker>("coingame ai duration", timestamp);
+
+        this.playerAiMemoryTracker = new MemoryTracker();
+        this.playerAiMemoryTrackerCSVWriter = new CSVWriter<>("coingame playerai memory", timestamp);
+        this.playerAiDurationTracker = new DurationTracker();
+        this.playerAiDurationTrackerCSVWriter = new CSVWriter<DurationTracker>("coingame playerai duration", timestamp);
+
     }
 
     @Override
@@ -30,6 +65,44 @@ public class CoinGame implements Game {
         System.out.println("Welcome to the Coin Game");
         CoinGameState state = initializeGame();
         playGame(state);
+    }
+
+    @Override
+    public void demo() {
+        demoMode = true;
+
+        // init game etc
+        CoinGameState state = new CoinGameState(CoinGameState.PLAYER_HUMAN, demoGameSize);
+        aiMinMax = new Minimax<>(demoMinmaxDepth, aiMode);
+        playerAiMinMax = new Minimax<>(demoMinmaxDepth, playerAiMode);
+        playGame(state);
+
+        // Write out logs to file
+        try {
+            aiMemoryTrackerCSVWriter.writeRun(aiMemoryTracker);
+            aiDurationTrackerCSVWriter.writeRun(aiDurationTracker);
+            playerAiMemoryTrackerCSVWriter.writeRun(playerAiMemoryTracker);
+            playerAiDurationTrackerCSVWriter.writeRun(playerAiDurationTracker);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        demoPlayCount--;
+        if (demoPlayCount > 0) { // run next test
+            aiMemoryTracker.resetTracker();
+            aiDurationTracker.resetTracker();
+            playerAiMemoryTracker.resetTracker();
+            playerAiDurationTracker.resetTracker();
+
+            demo();
+        } else {
+            try {
+                winTrackerCSVWriter.writeRun(winTracker);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private CoinGameState initializeGame() {
@@ -40,7 +113,7 @@ public class CoinGame implements Game {
         CoinGameState state = new CoinGameState(chosenStartPlayer, gameSize);
 
         int minmaxDepth = getMinMaxDepth();
-        minmax = new Minimax<>(minmaxDepth, mode);
+        aiMinMax = new Minimax<>(minmaxDepth, aiMode);
 
         return state;
     }
@@ -73,8 +146,11 @@ public class CoinGame implements Game {
             System.out.println(state);
 
             if (state.getCurrentPlayer() == CoinGameState.PLAYER_HUMAN) {
-//                state.applyMove(getPlayerMove(state));
-                handleAIMove(state);
+                if (demoMode) {
+                    handlePlayerAiMove(state);
+                } else {
+                    state.applyMove(getPlayerMove(state));
+                }
 
             } else {
                 handleAIMove(state);
@@ -89,23 +165,13 @@ public class CoinGame implements Game {
 
         if (playerWins) {
             System.out.println("Congratulations! You won!");
+            winTracker.playerWins();
 
         } else {
             System.out.println("You lost...");
+            winTracker.aiWins();
         }
         System.out.println("You: " + state.getPlayerScore() + " AI:" + state.getAiScore());
-
-        memoryTracker.printStats();
-        try {
-            memoryTrackerCSVWriter.writeRun(memoryTracker);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        playCount--;
-        if (playCount > 0) {
-            memoryTracker.resetTracker();
-            run();
-        }
     }
 
     private CoinGameMove getPlayerMove(CoinGameState state) {
@@ -124,16 +190,24 @@ public class CoinGame implements Game {
 
     private void handleAIMove(CoinGameState state) {
         System.out.println("AI is thinking...");
-        memoryTracker.startTracking();
-        CoinGameMove bestMove = minmax.getBestMove(state, true);
-        memoryTracker.stopTracking();
+        if (aiMemoryTracker != null) aiMemoryTracker.startTracking();
+        if (aiDurationTracker != null) aiDurationTracker.startTracking();
+        CoinGameMove bestMove = aiMinMax.getBestMove(state, true);
+        if (aiDurationTracker != null) aiDurationTracker.stopTracking();
+        if (aiMemoryTracker != null) aiMemoryTracker.stopTracking();
         System.out.println("AI plays: " + bestMove);
         state.applyMove(bestMove);
     }
 
-    public static void main(String[] args) {
-        CoinGame game = new CoinGame(Minimax.AB_LIMITED);
-        game.run();
+    private void handlePlayerAiMove(CoinGameState state) {
+        System.out.println("Player AI is thinking...");
+        if (playerAiMemoryTracker != null) playerAiMemoryTracker.startTracking();
+        if (playerAiDurationTracker != null) playerAiDurationTracker.startTracking();
+        CoinGameMove bestMove = playerAiMinMax.getBestMove(state, false);
+        if (playerAiDurationTracker != null) playerAiDurationTracker.stopTracking();
+        if (playerAiMemoryTracker != null) playerAiMemoryTracker.stopTracking();
+        System.out.println("AI plays: " + bestMove);
+        state.applyMove(bestMove);
     }
 
     public static void clearScreen() {

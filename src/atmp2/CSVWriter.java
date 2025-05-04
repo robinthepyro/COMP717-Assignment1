@@ -8,9 +8,15 @@ import java.util.List;
 
 public class CSVWriter<T extends CSVExportable> {
     private String datedFileName;
+    private LocalDateTime timestamp;
 
     public CSVWriter(String fileName) {
-        datedFileName = makeDatedFileName(fileName);
+        this(fileName, LocalDateTime.now());
+    }
+
+    public CSVWriter(String fileName, LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+        this.datedFileName = makeDatedFileName(fileName);
     }
 
     public void writeRun(T obj) throws IOException {
@@ -59,26 +65,11 @@ public class CSVWriter<T extends CSVExportable> {
         return lines.isEmpty() ? null : lines.get(lines.size() - 1);
     }
 
-    private static String makeDatedFileName(String fileName) {
+    private String makeDatedFileName(String fileName) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss");
-        String timestamp = LocalDateTime.now().format(formatter);
+        String formattedTimestamp = timestamp.format(formatter);
 
-        return "logs/" + timestamp + " " + fileName + ".csv";
+        return "logs/" + formattedTimestamp + " " + fileName + ".csv";
     }
 
-    public static void exportToCSV(CSVExportable obj, String fileName) throws IOException {
-        String datedFileName = makeDatedFileName(fileName);
-
-        try (FileWriter writer = new FileWriter(datedFileName)) {
-            String[] headers = obj.getCSVHeaders();
-            writer.write(String.join(",", headers));
-            writer.write("\n");
-
-            String[][] data = obj.getCSVData();
-            for (String[] row : data) {
-                writer.write(String.join(",", row));
-                writer.write("\n");
-            }
-        }
-    }
 }

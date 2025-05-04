@@ -3,9 +3,6 @@ package atmp2;
 
 import java.util.Scanner;
 
-import atmp2.CoinGame;
-import atmp2.TigerRewriteGame;
-
 public class GameSelector {
     private static Scanner scanner = new Scanner(System.in);
     private Game game;
