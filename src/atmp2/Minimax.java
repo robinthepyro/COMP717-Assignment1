@@ -3,6 +3,7 @@ package atmp2;
 import java.util.Map;
 import java.util.Random;
 
+
 public class Minimax<M extends Move<M>, S extends GameState<M>> {
     private int maxDepth;
     private int nodesEvaluated;
@@ -17,11 +18,11 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     public static final int RANDOM = 4;
 
     public static final Map<Integer, String> modes = Map.of(
-        AB_LIMITED, "Depth Limited Alpha Beta Pruned Minimax",
-        AB_COMPLETE, "Alpha Beta Pruned Minimax",
-        MINIMAX_LIMITED, "Depth Limited Minimax",
-        MINIMAX_COMPLETE, "Complete Minimax",
-        RANDOM, "Random");
+            AB_LIMITED, "Depth Limited Alpha Beta Pruned Minimax",
+            AB_COMPLETE, "Alpha Beta Pruned Minimax",
+            MINIMAX_LIMITED, "Depth Limited Minimax",
+            MINIMAX_COMPLETE, "Complete Minimax",
+            RANDOM, "Random");
 
     public Minimax(int maxDepth, int mode) {
         this.maxDepth = maxDepth;
@@ -71,7 +72,6 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
         if (mode == RANDOM) {
             return getRandomMove(state);
         }
-        // GameState<M> clonedState = state.clone();
         nodesEvaluated = 0;
         M bestMove = null;
         int bestScore = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -94,7 +94,6 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     }
 
     private int minimax(GameState<M> state, int depth, boolean maximizing, int alpha, int beta) {
-
         nodesEvaluated++;
         if (limited) {
             if (state.isTerminal() || depth >= maxDepth) {

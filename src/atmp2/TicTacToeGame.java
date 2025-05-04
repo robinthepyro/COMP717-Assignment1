@@ -18,7 +18,7 @@ public class TicTacToeGame implements Game {
 
     public TicTacToeGame(int minimaxMode) {
         this.minimaxMode = minimaxMode;
-        this.state = new TicTacToeGameState(5);
+        this.state = new TicTacToeGameState(4);
         this.playerIsX = pickTicTacToePlayerChar();
     }
 

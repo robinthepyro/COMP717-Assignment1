@@ -169,7 +169,7 @@ public class CoinGame implements Game {
                 playDemoTurn(secondAi);
             }
             try {
-                Thread.sleep(500);
+                Thread.sleep(50);
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
             }

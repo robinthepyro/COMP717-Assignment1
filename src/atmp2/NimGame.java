@@ -239,6 +239,7 @@ public class NimGame implements Game {
         boolean aiIsMaximizing = state.getPlayer() == NimGameState.HUMAN_PLAYER;
         NimMove move = m.getBestMove(state, aiIsMaximizing);
         System.out.println("AI plays: " + move);
+        System.out.println("a");
         state.applyMove(move);
     }
 
@@ -252,7 +253,7 @@ public class NimGame implements Game {
         int firstAIType = MinimaxSetupHelper.pickAIType();
         if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
             int xDifficulty = MinimaxSetupHelper.pickDepth();
-            firstAI = new Minimax<>(firstAIType, xDifficulty);
+            firstAI = new Minimax<>(7, firstAIType);
         } else {
             firstAI = new Minimax<>(firstAIType);
         }
@@ -262,7 +263,7 @@ public class NimGame implements Game {
         int secondAITYpe = MinimaxSetupHelper.pickAIType();
         if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
             int oDifficulty = MinimaxSetupHelper.pickDepth();
-            secondAI = new Minimax<>(secondAITYpe);
+            secondAI = new Minimax<>(7, secondAITYpe);
         } else {
             secondAI = new Minimax<>(firstAIType);
         }
@@ -286,6 +287,8 @@ public class NimGame implements Game {
             if (state.isTerminal()) {
                 break;
             }
+
+
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ie) {
