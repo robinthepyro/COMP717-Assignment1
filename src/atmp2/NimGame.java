@@ -43,12 +43,14 @@ public class NimGame implements Game {
         NimGameState state = new NimGameState(playerTurn);
 
         // Get Minimax depth from the user
-        int depth = -1;
         if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAX_LIMITED) {
             System.out.println(mode);
-            depth = getMinimaxDepth();
+            int depth = getMinimaxDepth();
+            minimax = new Minimax<>(depth, mode);
         }
-        minimax = new Minimax<>(depth, mode);
+        else {
+            minimax = new Minimax<>(mode);
+        }
 
         return state;
     }
@@ -204,8 +206,8 @@ public class NimGame implements Game {
     }
 
     public static void main(String[] args) {
-        NimGame g = new NimGame();
-        g.demo();
+        NimGame g = new NimGame(Minimax.MINIMAX_LIMITED);
+        g.run();
     }
 
     public static int pickAIType(String aiName) {
@@ -244,7 +246,6 @@ public class NimGame implements Game {
     public void demo() {
         Minimax<NimMove, NimGameState> firstAI;
         Minimax<NimMove, NimGameState> secondAI;
-
 
         // pick ai 1
         System.out.println("Pick Mode for First Player");
