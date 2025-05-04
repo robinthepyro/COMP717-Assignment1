@@ -1,14 +1,15 @@
 package atmp2;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MemoryTracker {
+public class MemoryTracker implements CSVExportable {
     private static final Runtime runtime = Runtime.getRuntime();
-    private LinkedList<Long> memoryFrames = new LinkedList<>();
+    private ArrayList<Long> memoryFrames = new ArrayList<>();
     private final AtomicBoolean running = new AtomicBoolean(false);
     private Thread trackerThread;
+    private int resolution = 1;  // in ms, smaller is higher resolution
 
     public void startTracking() {
         if (running.get()) return; // prevent the tracker instance being started multiple times.
@@ -20,7 +21,7 @@ public class MemoryTracker {
                 memoryFrames.add(usedMemory);
 
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(resolution);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -41,7 +42,12 @@ public class MemoryTracker {
         }
     }
 
-    public LinkedList<Long> getMemoryFrames() {
+    public void resetTracker() {
+        stopTracking();
+        memoryFrames.clear();
+    }
+
+    public ArrayList<Long> getMemoryFrames() {
         return memoryFrames;
     }
 
@@ -62,5 +68,25 @@ public class MemoryTracker {
         System.out.println("Average memory usage: " + (average / (1024 * 1024)) + " MB");
         System.out.println("Samples collected: " + memoryFrames.size());
         System.out.println("======");
+    }
+
+    @Override
+    public String[] getCSVHeaders() {
+        String[] headers = new String[2];
+        headers[0] = "frame_num";
+        headers[1] = "memory_bytes";
+        return headers;
+    }
+
+    @Override
+    public String[][] getCSVData() {
+        String[][] data = new String[memoryFrames.size()][2];
+
+        for (int i = 0; i < memoryFrames.size(); i++) {
+            data[i][0] = String.valueOf(i);
+            data[i][1] = String.valueOf(memoryFrames.get(i));
+        }
+
+        return data;
     }
 }
