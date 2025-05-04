@@ -2,6 +2,7 @@ package atmp2;
 
 import java.util.Scanner;
 
+import atmp2.MinimaxSetupHelper;
 import atmp2.TicTacToeGameState;
 import atmp2.TicTacToeMove;
 
@@ -150,41 +151,6 @@ public class TicTacToeGame implements Game {
         return playerIsX;
     }
 
-    public static int pickDepth() {
-        int depth = 5;
-        System.out.printf("Enter minimax depth (default %d).\n", depth);
-        String input = scanner.nextLine();
-        try {
-            depth = Integer.parseInt(input);
-
-        } catch (NumberFormatException e) {
-            System.out.printf("Invalid integer, using default depth: %d\n", depth);
-        }
-        return depth;
-    }
-
-    private static int pickAIType(String aiName) {
-        System.out.println("Select a type for " + aiName);
-        System.out.println("1. depth limited alpha beta pruned minimax");
-        System.out.println("2. complete alpha beta pruned minimax");
-        System.out.println("3. depth limited minimax");
-        System.out.println("4. complete minimax");
-        System.out.println("5. random moves");
-        while (true) {
-            try {
-                Scanner scanner = new Scanner(System.in);
-                int choice = Integer.parseInt(scanner.nextLine());
-                if (choice < 6 & choice > 0) {
-                    return choice - 1;
-                }
-                System.out.println("Invalid Selection, input a number 1-5");
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid Selection, input a number 1-5");
-            }
-
-        }
-    }
-
     private void playDemoTurn(Minimax<TicTacToeMove, TicTacToeGameState> m, boolean random) {
         System.out.println("AI is thinking...");
         boolean aiIsMaximizing = state.getCurrentPlayer() == X_PLAYER;
@@ -198,9 +164,10 @@ public class TicTacToeGame implements Game {
         Minimax<TicTacToeMove, TicTacToeGameState> oAi;
 
         // pick ai 1
-        int xAiType = pickAIType("X");
-        if (xAiType == Minimax.AB_LIMITED || xAiType == Minimax.MINIMAXLIMITED) {
-            int xDifficulty = pickDepth();
+        System.out.println("Pick mode for X");
+        int xAiType = MinimaxSetupHelper.pickAIType();
+        if (xAiType == Minimax.AB_LIMITED || xAiType == Minimax.MINIMAX_LIMITED) {
+            int xDifficulty = MinimaxSetupHelper.pickDepth();
             xAi = new Minimax<>(xAiType, xDifficulty);
         } else if (xAiType == 5) {
             xAi = new Minimax<>(0);
@@ -209,9 +176,9 @@ public class TicTacToeGame implements Game {
         }
 
         // pick ai 2
-        int oAiType = pickAIType("O");
-        if (oAiType == Minimax.AB_LIMITED || oAiType == Minimax.MINIMAXLIMITED) {
-            int oDifficulty = pickDepth();
+        int oAiType = MinimaxSetupHelper.pickAIType();
+        if (oAiType == Minimax.AB_LIMITED || oAiType == Minimax.MINIMAX_LIMITED) {
+            int oDifficulty = MinimaxSetupHelper.pickDepth();
             oAi = new Minimax<>(oAiType);
         } else {
             oAi = new Minimax<>(xAiType);

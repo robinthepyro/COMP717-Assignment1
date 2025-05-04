@@ -25,7 +25,7 @@ public class GameSelector {
 
             // pve mode
             if (humanVsAi) {
-                int mode = pickMinimaxMode();
+                int mode = MinimaxSetupHelper.pickAIType();
                 switch (choice) {
                     case 1:
                         // Setup for Tic Tac Toe
@@ -42,7 +42,7 @@ public class GameSelector {
                         game.run();
                         break;
                     case 4:
-                        game = new TigerRewriteGame(mode);
+                        game = new TVDGame(mode);
                         game.run();
                         break;
                     case 5:
@@ -71,7 +71,7 @@ public class GameSelector {
                         game.demo();
                         break;
                     case 4:
-                        game = new TigerRewriteGame();
+                        game = new TVDGame();
                         game.demo();
                         break;
                     case 5:

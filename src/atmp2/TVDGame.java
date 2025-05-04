@@ -1,11 +1,13 @@
 package atmp2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Stack;
 
 import atmp2.Minimax;
+import atmp2.MinimaxHelper;
 import atmp2.NimGame;
 import atmp2.TicTacToeGame;
 import atmp2.TigerGameStateRewrite;
@@ -17,9 +19,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
-public class TigerRewriteGame implements Game {
-    public Minimax<TigerVsDogsMove, TigerGameStateRewrite> minimax;
-    public TigerGameStateRewrite state;
+public class TVDGame implements Game {
+    public Minimax<TVDMove, TVDState> minimax;
+    public TVDState state;
     public Scanner scanner = new Scanner(System.in);
     public Random rand = new Random();
     boolean humanPlaysAsTiger;
@@ -45,13 +47,13 @@ public class TigerRewriteGame implements Game {
             8, new Coord(1, 1) // down-right
     );
 
-    public TigerRewriteGame(int mode) {
-        state = new TigerGameStateRewrite();
+    public TVDGame(int mode) {
+        state = new TVDState();
         this.mode = mode;
     }
 
-    public TigerRewriteGame() {
-        state = new TigerGameStateRewrite();
+    public TVDGame() {
+        state = new TVDState();
     }
 
     public void test() {
@@ -63,7 +65,7 @@ public class TigerRewriteGame implements Game {
         System.out.flush();
     }
 
-    public static void display(TigerGameStateRewrite state) {
+    public static void display(TVDState state) {
         clearScreen();
         // Pre-format all cell contents
         String[][] formattedCells = new String[state.board.length][state.board.length];
@@ -113,10 +115,10 @@ public class TigerRewriteGame implements Game {
 
     private static String formatCellContent(int firstIndex, int secondIndex, int[][] board) {
         return switch (board[firstIndex][secondIndex]) {
-            case TigerGameStateRewrite.DOG -> String.format("%2d", firstIndex * 5 + secondIndex); // Dog with ID
-                                                                                                  // (padded)
-            case TigerGameStateRewrite.TIGER -> " T"; // Tiger
-            case TigerGameStateRewrite.EMPTY -> "  "; // Empty
+            case TVDState.DOG -> String.format("%2d", firstIndex * 5 + secondIndex); // Dog with ID
+                                                                                     // (padded)
+            case TVDState.TIGER -> " T"; // Tiger
+            case TVDState.EMPTY -> "  "; // Empty
             default -> "??"; // Unknown
         };
     }
@@ -146,28 +148,28 @@ public class TigerRewriteGame implements Game {
         while (true) {
             if (humanPlaysAsTiger) {
                 display(state);
-                TigerVsDogsMove hMove = humanTigerMove();
+                TVDMove hMove = humanTigerMove();
                 state.applyMove(hMove);
                 if (state.isTerminal()) {
                     break;
                 }
 
                 display(state);
-                TigerVsDogsMove aMove = minimax.getBestMove(state, false);
+                TVDMove aMove = minimax.getBestMove(state, false);
                 state.applyMove(aMove);
                 if (state.isTerminal()) {
                     break;
                 }
             } else {
                 display(state);
-                TigerVsDogsMove aMove = minimax.getBestMove(state, true);
+                TVDMove aMove = minimax.getBestMove(state, true);
                 state.applyMove(aMove);
                 if (state.isTerminal()) {
                     break;
                 }
 
                 display(state);
-                TigerVsDogsMove hMove = humanDogMove();
+                TVDMove hMove = humanDogMove();
                 state.applyMove(hMove);
                 if (state.isTerminal()) {
                     break;
@@ -177,7 +179,7 @@ public class TigerRewriteGame implements Game {
         }
         display(state);
         System.out.println("GAME OVER");
-        System.out.println("The Winner is " + ((state.getWinner() == TigerGameStateRewrite.TIGER) ? "Tiger" : "Dogs"));
+        System.out.println("The Winner is " + ((state.getWinner() == TVDState.TIGER) ? "Tiger" : "Dogs"));
         scanner.nextLine();
 
     }
@@ -190,8 +192,8 @@ public class TigerRewriteGame implements Game {
             int dog;
             try {
                 dog = scanner.nextInt();
-                ret = TigerGameStateRewrite.oneDToTwoD(dog);
-                if (state.getNode(ret) == TigerGameStateRewrite.DOG)
+                ret = TVDState.oneDToTwoD(dog);
+                if (state.getNode(ret) == TVDState.DOG)
                     break;
                 System.out.println("❌ That ID doesn't point to a living dog. Try again.");
             } catch (InputMismatchException e) {
@@ -203,10 +205,10 @@ public class TigerRewriteGame implements Game {
         return ret;
     }
 
-    private TigerVsDogsMove humanDogMove() {
+    private TVDMove humanDogMove() {
         Coord start = pickDog();
         Coord direction = pickDirection(getEmptyNeighbourDirections(start));
-        return new TigerVsDogsMove(start, start.add(direction));
+        return new TVDMove(start, start.add(direction));
 
     }
 
@@ -240,10 +242,10 @@ public class TigerRewriteGame implements Game {
         return ret;
     }
 
-    public TigerVsDogsMove humanTigerMove() {
+    public TVDMove humanTigerMove() {
         Coord start = state.getTigerPos();
         Coord direction = pickDirection(getEmptyNeighbourDirections(start));
-        return new TigerVsDogsMove(start, start.add(direction));
+        return new TVDMove(start, start.add(direction));
     }
 
     private Coord pickDirection(List<Integer> directions) {
@@ -304,7 +306,7 @@ public class TigerRewriteGame implements Game {
 
     public void setup() {
         boolean invalid = true;
-        state = new TigerGameStateRewrite();
+        state = new TVDState();
         while (invalid) {
             System.out.println("Would you like to play as the tiger, dogs, or a random side [t|d|R]");
             String raw = scanner.nextLine();
@@ -348,29 +350,32 @@ public class TigerRewriteGame implements Game {
     }
 
     public static void main(String[] args) {
-        TigerRewriteGame g = new TigerRewriteGame();
+        TVDGame g = new TVDGame();
         g.demo();
 
     }
 
     @Override
     public void demo() {
-        Minimax<TigerVsDogsMove, TigerGameStateRewrite> tigerAi;
-        Minimax<TigerVsDogsMove, TigerGameStateRewrite> dogAi;
+        Minimax<TVDMove, TVDState> tigerAi;
+        Minimax<TVDMove, TVDState> dogAi;
+        List<Integer> validOpts = Arrays.asList(Minimax.AB_LIMITED, Minimax.MINIMAX_LIMITED, Minimax.RANDOM);
         // pick ai 1 type
-        int tigerAiType = NimGame.pickAIType("Tiger");
+        System.out.println("Pick a mode for Tiger");
+        int tigerAiType = MinimaxSetupHelper.pickValidAiType(validOpts);
         // set depth if relevant
-        if (tigerAiType == Minimax.AB_LIMITED | tigerAiType == Minimax.MINIMAXLIMITED) {
-            int depth = TicTacToeGame.pickDepth();
+        if (tigerAiType == Minimax.AB_LIMITED | tigerAiType == Minimax.MINIMAX_LIMITED) {
+            int depth = MinimaxSetupHelper.pickDepth();
             tigerAi = new Minimax<>(depth, tigerAiType);
         } else {
             tigerAi = new Minimax<>(tigerAiType);
         }
         // pick ai 2 type
-        int dogAiType = NimGame.pickAIType("Dogs");
+        System.out.println("Pick a mode for Dogs");
+        int dogAiType = MinimaxSetupHelper.pickValidAiType(validOpts);
         // set depth if relevant
-        if (dogAiType == Minimax.AB_LIMITED | dogAiType == Minimax.MINIMAXLIMITED) {
-            int depth = TicTacToeGame.pickDepth();
+        if (dogAiType == Minimax.AB_LIMITED | dogAiType == Minimax.MINIMAX_LIMITED) {
+            int depth = MinimaxSetupHelper.pickDepth();
             dogAi = new Minimax<>(depth, dogAiType);
         } else {
             dogAi = new Minimax<>(dogAiType);
@@ -393,5 +398,7 @@ public class TigerRewriteGame implements Game {
             }
         }
         // report result
+        System.out.println("The winner is " +
+                (state.getWinner() == TVDState.TIGER ? "Tiger" : "Dogs"));
     }
 }

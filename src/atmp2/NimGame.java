@@ -43,7 +43,7 @@ public class NimGame implements Game {
 
         // Get Minimax depth from the user
         int depth = -1;
-        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAXLIMITED) {
+        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAX_LIMITED) {
             System.out.println(mode);
             depth = getMinimaxDepth();
         }
@@ -246,7 +246,7 @@ public class NimGame implements Game {
 
         // pick ai 1
         int firstAIType = pickAIType("first ai");
-        if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAXLIMITED) {
+        if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
             // TODO fix the smell here
             // ugly ugly code, needs a refactor
             int xDifficulty = TicTacToeGame.pickDepth();
@@ -257,7 +257,7 @@ public class NimGame implements Game {
 
         // pick ai 2
         int secondAITYpe = pickAIType("second ai");
-        if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAXLIMITED) {
+        if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
             // TODO fix the smell here
             // ugly ugly code, needs a refactor
             int oDifficulty = TicTacToeGame.pickDepth();

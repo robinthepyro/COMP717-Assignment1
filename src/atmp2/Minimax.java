@@ -1,5 +1,6 @@
 package atmp2;
 
+import java.util.Map;
 import java.util.Random;
 
 public class Minimax<M extends Move<M>, S extends GameState<M>> {
@@ -10,10 +11,17 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     private boolean limited;
 
     public static final int AB_LIMITED = 0;
-    public static final int ABCOMPLETE = 1;
-    public static final int MINIMAXLIMITED = 2;
+    public static final int AB_COMPLETE = 1;
+    public static final int MINIMAX_LIMITED = 2;
     public static final int MINIMAX_COMPLETE = 3;
     public static final int RANDOM = 4;
+
+    public static final Map<Integer, String> modes = Map.of(
+        AB_LIMITED, "Depth Limited Alpha Beta Pruned Minimax",
+        AB_COMPLETE, "Alpha Beta Pruned Minimax",
+        MINIMAX_LIMITED, "Depth Limited Minimax",
+        MINIMAX_COMPLETE, "Complete Minimax",
+        RANDOM, "Random");
 
     public Minimax(int maxDepth, int mode) {
         this.maxDepth = maxDepth;
@@ -24,21 +32,19 @@ public class Minimax<M extends Move<M>, S extends GameState<M>> {
     public Minimax(int mode) {
         // sanity check my code
         if (mode > RANDOM | mode < AB_LIMITED) {
-            System.err.println("You Should Not Be Doing that. Do better <3");
-            System.out.println("Listen to this song and think about what you have done");
-            throw new IllegalArgumentException("https://open.spotify.com/track/3gq0rDxpS9e6sbO72PBWbn");
+            throw new IllegalArgumentException("Invalid Minimax Mode.");
         }
         this.mode = mode;
         init();
     }
 
     private void init() {
-        if (mode == MINIMAXLIMITED | mode == AB_LIMITED) {
+        if (mode == MINIMAX_LIMITED | mode == AB_LIMITED) {
             limited = true;
         } else {
             limited = false;
         }
-        if (mode == AB_LIMITED | mode == ABCOMPLETE) {
+        if (mode == AB_LIMITED | mode == AB_COMPLETE) {
             ab = true;
         } else {
             ab = false;

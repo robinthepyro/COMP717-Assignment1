@@ -36,7 +36,7 @@ public class CoinGame implements Game {
         CoinGameState state = new CoinGameState(chosenStartPlayer, 20);
 
         int minmaxDepth = -1;
-        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAXLIMITED) {
+        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAX_LIMITED) {
 
             minmaxDepth = getMinMaxDepth();
         }
@@ -141,7 +141,7 @@ public class CoinGame implements Game {
         Minimax<CoinGameMove, CoinGameState> firstAi;
         int firstAiType = NimGame.pickAIType("First Ai");
         Minimax<CoinGameMove, CoinGameState> secondAi;
-        if (firstAiType == Minimax.AB_LIMITED || firstAiType == Minimax.MINIMAXLIMITED) {
+        if (firstAiType == Minimax.AB_LIMITED || firstAiType == Minimax.MINIMAX_LIMITED) {
             int firstDifficulty = TicTacToeGame.pickDepth();
             firstAi = new Minimax<>(firstDifficulty, firstAiType);
         } else {
@@ -149,7 +149,7 @@ public class CoinGame implements Game {
         }
 
         int secondAiType = NimGame.pickAIType("Second Ai");
-        if (secondAiType == Minimax.AB_LIMITED || secondAiType == Minimax.MINIMAXLIMITED) {
+        if (secondAiType == Minimax.AB_LIMITED || secondAiType == Minimax.MINIMAX_LIMITED) {
             int secondDifficulty = TicTacToeGame.pickDepth();
             secondAi = new Minimax<>(secondDifficulty, secondAiType);
         } else {
