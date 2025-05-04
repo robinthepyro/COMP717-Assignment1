@@ -6,13 +6,21 @@ import java.util.*;
 public class TicTacToeGameState implements GameState<TicTacToeMove> {
     private static final int X_PLAYER = 1;
     private static final int O_PLAYER = 2;
-    private static final int BOARD_SIZE = 3;
+    public final int BOARD_SIZE;
 
     private int[][] board;
     private int currentPlayer;
     private int movesPlayed;
 
     public TicTacToeGameState() {
+        this.BOARD_SIZE = 3;
+        board = new int[BOARD_SIZE][BOARD_SIZE];
+        currentPlayer = X_PLAYER; // X starts
+        movesPlayed = 0;
+    }
+
+    public TicTacToeGameState(int boardSize) {
+        this.BOARD_SIZE = boardSize;
         board = new int[BOARD_SIZE][BOARD_SIZE];
         currentPlayer = X_PLAYER; // X starts
         movesPlayed = 0;
@@ -20,6 +28,7 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
 
     private TicTacToeGameState(int[][] board, int currentPlayer, int movesPlayed) {
         this.board = deepCopyBoard(board);
+        this.BOARD_SIZE = 3;
         this.currentPlayer = currentPlayer;
         this.movesPlayed = movesPlayed;
     }
@@ -84,22 +93,64 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
     }
 
     public int getWinner() {
-        // Check rows, columns, and diagonals
+        // Check rows
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if (board[i][0] != 0 && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
-                return board[i][0];
+            int first = board[i][0];
+            if (first == 0)
+                continue;
+            boolean win = true;
+            for (int j = 1; j < BOARD_SIZE; j++) {
+                if (board[i][j] != first) {
+                    win = false;
+                    break;
+                }
             }
-            if (board[0][i] != 0 && board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
-                return board[0][i];
-            }
+            if (win)
+                return first;
         }
 
-        // Check diagonals
-        if (board[0][0] != 0 && board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
-            return board[0][0];
+        // Check columns
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            int first = board[0][j];
+            if (first == 0)
+                continue;
+            boolean win = true;
+            for (int i = 1; i < BOARD_SIZE; i++) {
+                if (board[i][j] != first) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win)
+                return first;
         }
-        if (board[0][2] != 0 && board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
-            return board[0][2];
+
+        // Check main diagonal
+        int first = board[0][0];
+        if (first != 0) {
+            boolean win = true;
+            for (int i = 1; i < BOARD_SIZE; i++) {
+                if (board[i][i] != first) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win)
+                return first;
+        }
+
+        // Check anti-diagonal
+        first = board[0][BOARD_SIZE - 1];
+        if (first != 0) {
+            boolean win = true;
+            for (int i = 1; i < BOARD_SIZE; i++) {
+                if (board[i][BOARD_SIZE - 1 - i] != first) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win)
+                return first;
         }
 
         return 0; // No winner
@@ -151,12 +202,36 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
     }
 
     public void displayGameState() {
-        final String TOP_BORDER = "┌───┬───┬───┐";
-        final String MID_SEPARATOR = "├───┼───┼───┤";
-        final String BOTTOM_BORDER = "└───┴───┴───┘";
         final String VERT_SEP = "│";
+        final String HORIZ = "───";
+        final String CROSS = "┼";
+        final String TOP_LEFT = "┌", TOP_MID = "┬", TOP_RIGHT = "┐";
+        final String MID_LEFT = "├", MID_MID = "┼", MID_RIGHT = "┤";
+        final String BOT_LEFT = "└", BOT_MID = "┴", BOT_RIGHT = "┘";
 
-        System.out.println(TOP_BORDER);
+        // Generate top, middle, and bottom borders dynamically
+        StringBuilder topBorder = new StringBuilder(TOP_LEFT);
+        StringBuilder midSeparator = new StringBuilder(MID_LEFT);
+        StringBuilder bottomBorder = new StringBuilder(BOT_LEFT);
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            topBorder.append(HORIZ);
+            midSeparator.append(HORIZ);
+            bottomBorder.append(HORIZ);
+
+            if (i < BOARD_SIZE - 1) {
+                topBorder.append(TOP_MID);
+                midSeparator.append(CROSS);
+                bottomBorder.append(BOT_MID);
+            } else {
+                topBorder.append(TOP_RIGHT);
+                midSeparator.append(MID_RIGHT);
+                bottomBorder.append(BOT_RIGHT);
+            }
+        }
+
+        // Print the board
+        System.out.println(topBorder);
         for (int i = 0; i < BOARD_SIZE; i++) {
             System.out.print(VERT_SEP);
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -168,15 +243,13 @@ public class TicTacToeGameState implements GameState<TicTacToeMove> {
                 System.out.print(" " + symbol + " " + VERT_SEP);
             }
             System.out.println();
-
             if (i < BOARD_SIZE - 1) {
-                System.out.println(MID_SEPARATOR);
+                System.out.println(midSeparator);
             } else {
-                System.out.println(BOTTOM_BORDER);
+                System.out.println(bottomBorder);
             }
         }
     }
-
 
     public int getCurrentPlayer() {
         return currentPlayer;

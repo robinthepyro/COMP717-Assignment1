@@ -18,7 +18,7 @@ public class TicTacToeGame implements Game {
 
     public TicTacToeGame(int minimaxMode) {
         this.minimaxMode = minimaxMode;
-        this.state = new TicTacToeGameState();
+        this.state = new TicTacToeGameState(5);
         this.playerIsX = pickTicTacToePlayerChar();
     }
 
@@ -32,8 +32,7 @@ public class TicTacToeGame implements Game {
     public void run() {
         if (minimaxMode == Minimax.AB_LIMITED | minimaxMode == Minimax.MINIMAX_LIMITED) {
             minimax = new Minimax<>(MinimaxSetupHelper.pickDepth(), minimaxMode);
-        }
-        else {
+        } else {
             minimax = new Minimax<>(minimaxMode);
         }
         System.out.println("Welcome to Tic Tac Toe!");
@@ -89,9 +88,9 @@ public class TicTacToeGame implements Game {
             if (scanner.hasNextInt()) {
                 input = scanner.nextInt();
                 // adjust from human friendly 1 based indexing to 0 based indexing
-                input--;
-                if (input >= 0 && input <= 2) {
+                if (input >= 0 && input <= state.BOARD_SIZE) {
                     scanner.nextLine(); // clear newline
+                    input--;
                     return input;
                 } else {
                     System.out.println("Input out of bounds! Enter a number between 1 and 3.");
@@ -220,7 +219,7 @@ public class TicTacToeGame implements Game {
     }
 
     public static void main(String[] args) {
-        Game game = new TicTacToeGame();
-        game.demo();
+        Game game = new TicTacToeGame(Minimax.AB_COMPLETE);
+        game.run();
     }
 }
