@@ -1,46 +1,45 @@
 package atmp2;
 
+import java.io.IOException;
 import java.util.Scanner;
 
-import atmp2.CoinGameState;
-import atmp2.Minimax;
-import atmp2.MinimaxSetupHelper;
-import atmp2.NimGame;
+/**
+ * TODO:
+ * Allow making the game AI vs AI with a flag (this just disables prompts etc)
+ */
 
 public class CoinGame implements Game {
     private final Scanner scanner = new Scanner(System.in);
     private Minimax<CoinGameMove, CoinGameState> minmax;
     private MemoryTracker memoryTracker = new MemoryTracker();
+    private CSVWriter<MemoryTracker> memoryTrackerCSVWriter;
     private int mode;
-    private CoinGameState state;
-    private boolean demoOddTurn;
+    private int playCount;
+    private int gameSize;
 
     public CoinGame(int mode) {
         this.mode = mode;
-    }
 
-    public CoinGame() {
-        this.state = new CoinGameState(CoinGameState.PLAYER_AI, 20);
+        this.memoryTrackerCSVWriter = new CSVWriter<>("coingame memory");
+        this.playCount = 3;
+        this.gameSize = 100;
     }
 
     @Override
     public void run() {
         System.out.println("Welcome to the Coin Game");
-        state = initializeGame();
+        CoinGameState state = initializeGame();
         playGame(state);
     }
 
     private CoinGameState initializeGame() {
         boolean playerStarts = getPlayerStartChoice();
-        int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN : CoinGameState.PLAYER_AI;
+        int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN :
+                CoinGameState.PLAYER_AI;
 
-        CoinGameState state = new CoinGameState(chosenStartPlayer, 20);
+        CoinGameState state = new CoinGameState(chosenStartPlayer, gameSize);
 
-        int minmaxDepth = -1;
-        if (mode == Minimax.AB_LIMITED | mode == Minimax.MINIMAX_LIMITED) {
-
-            minmaxDepth = getMinMaxDepth();
-        }
+        int minmaxDepth = getMinMaxDepth();
         minmax = new Minimax<>(minmaxDepth, mode);
 
         return state;
@@ -68,14 +67,15 @@ public class CoinGame implements Game {
 
     private void playGame(CoinGameState state) {
         while (true) {
-            if (state.isTerminal())
-                break;
+            if (state.isTerminal()) break;
+            System.out.println("----------");
             clearScreen();
-            displayState();
-            System.out.println("You: " + state.getPlayerScore() + " AI:" + state.getAiScore());
-            System.out.println("Will you pick from the left or right? (l/r)");
+            System.out.println(state);
+
             if (state.getCurrentPlayer() == CoinGameState.PLAYER_HUMAN) {
-                state.applyMove(getPlayerMove(state));
+//                state.applyMove(getPlayerMove(state));
+                handleAIMove(state);
+
             } else {
                 handleAIMove(state);
             }
@@ -96,10 +96,21 @@ public class CoinGame implements Game {
         System.out.println("You: " + state.getPlayerScore() + " AI:" + state.getAiScore());
 
         memoryTracker.printStats();
+        try {
+            memoryTrackerCSVWriter.writeRun(memoryTracker);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        playCount--;
+        if (playCount > 0) {
+            memoryTracker.resetTracker();
+            run();
+        }
     }
 
     private CoinGameMove getPlayerMove(CoinGameState state) {
         while (true) {
+            System.out.println("Will you pick from the left or right? (l/r)");
             String input = scanner.nextLine().trim().toLowerCase();
             if (input.startsWith("l")) {
                 return new CoinGameMove(Side.LEFT, state.getCurrentPlayer());
@@ -121,74 +132,12 @@ public class CoinGame implements Game {
     }
 
     public static void main(String[] args) {
-        CoinGame game = new CoinGame();
-        game.demo();
+        CoinGame game = new CoinGame(Minimax.AB_LIMITED);
+        game.run();
     }
 
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
-    }
-
-    private void displayState() {
-        clearScreen();
-        System.out.println("─".repeat(state.toString().length()));
-        System.out.println(state);
-        System.out.println("─".repeat(state.toString().length()));
-    }
-
-    @Override
-    public void demo() {
-        Minimax<CoinGameMove, CoinGameState> firstAi;
-        int firstAiType = NimGame.pickAIType("First Ai");
-        Minimax<CoinGameMove, CoinGameState> secondAi;
-        if (firstAiType == Minimax.AB_LIMITED || firstAiType == Minimax.MINIMAX_LIMITED) {
-            int firstDifficulty = MinimaxSetupHelper.pickDepth();
-            firstAi = new Minimax<>(firstDifficulty, firstAiType);
-        } else {
-            firstAi = new Minimax<>(firstAiType);
-        }
-
-        int secondAiType = NimGame.pickAIType("Second Ai");
-        if (secondAiType == Minimax.AB_LIMITED || secondAiType == Minimax.MINIMAX_LIMITED) {
-            int secondDifficulty = MinimaxSetupHelper.pickDepth();
-            secondAi = new Minimax<>(secondDifficulty, secondAiType);
-        } else {
-            secondAi = new Minimax<>(secondAiType);
-        }
-
-        while (true) {
-            demoOddTurn = !demoOddTurn;
-            displayState();
-            if (state.isTerminal()) {
-                break;
-            }
-            if (demoOddTurn) {
-                playDemoTurn(firstAi);
-            } else {
-                playDemoTurn(secondAi);
-            }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        displayState();
-
-        System.out
-                .println("The winner is the "
-                        + ((state.getAiScore() < state.getPlayerScore()) ? "Seocnd AI" : "First AI"));
-        System.out.println("First AI " + state.getAiScore() + "Second AI:" + state.getPlayerScore());
-
-    }
-
-    private void playDemoTurn(Minimax<CoinGameMove, CoinGameState> m) {
-        System.out.println("AI is thinking...");
-        // TODO fix the fact that one of the ai players has to be considered a HUMAN
-        // player.
-        CoinGameMove move = m.getBestMove(state, demoOddTurn);
-        System.out.println("AI plays: " + move);
-        state.applyMove(move);
     }
 }
