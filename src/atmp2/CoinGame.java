@@ -5,12 +5,15 @@ import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class CoinGame implements Game {
+    String testPrefix = "limited vs complete";
+
     private final Scanner scanner = new Scanner(System.in);
     private Minimax<CoinGameMove, CoinGameState> aiMinMax;
     private int aiMode;
     private int gameSize;
     private WinTracker winTracker = new WinTracker();
-    private CSVWriter<WinTracker> winTrackerCSVWriter = new CSVWriter<>("coingame wins");
+
+    private CSVWriter<WinTracker> winTrackerCSVWriter = new CSVWriter<>("coingame " + testPrefix + " accumulative wins ");
 
     // Demo mode stuff
     private boolean demoMode; // True when AI vs AI
@@ -43,21 +46,20 @@ public class CoinGame implements Game {
     public CoinGame() {
         this.demoGameSize = 100;
         this.demoPlayCount = 500;
-        this.aiMode = Minimax.AB_LIMITED;
         this.playerAiMode = Minimax.AB_LIMITED;
+        this.aiMode = Minimax.AB_COMPLETE;
         this.demoMinmaxDepth = 50;
 
         LocalDateTime timestamp = LocalDateTime.now();
         this.aiMemoryTracker = new MemoryTracker();
-        this.aiMemoryTrackerCSVWriter = new CSVWriter<>("coingame ai memory", timestamp);
+        this.aiMemoryTrackerCSVWriter = new CSVWriter<>("coingame " + testPrefix + " ai memory ", timestamp);
         this.aiDurationTracker = new DurationTracker();
-        this.aiDurationTrackerCSVWriter = new CSVWriter<DurationTracker>("coingame ai duration", timestamp);
+        this.aiDurationTrackerCSVWriter = new CSVWriter<DurationTracker>("coingame " + testPrefix + " ai duration ", timestamp);
 
         this.playerAiMemoryTracker = new MemoryTracker();
-        this.playerAiMemoryTrackerCSVWriter = new CSVWriter<>("coingame playerai memory", timestamp);
+        this.playerAiMemoryTrackerCSVWriter = new CSVWriter<>("coingame " + testPrefix + " playerai memory ", timestamp);
         this.playerAiDurationTracker = new DurationTracker();
-        this.playerAiDurationTrackerCSVWriter = new CSVWriter<DurationTracker>("coingame playerai duration", timestamp);
-
+        this.playerAiDurationTrackerCSVWriter = new CSVWriter<DurationTracker>("coingame" + testPrefix + " playerai duration ", timestamp);
     }
 
     @Override
@@ -83,6 +85,8 @@ public class CoinGame implements Game {
             aiDurationTrackerCSVWriter.writeRun(aiDurationTracker);
             playerAiMemoryTrackerCSVWriter.writeRun(playerAiMemoryTracker);
             playerAiDurationTrackerCSVWriter.writeRun(playerAiDurationTracker);
+            winTrackerCSVWriter.writeRun(winTracker);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,11 +100,11 @@ public class CoinGame implements Game {
 
             demo();
         } else {
-            try {
-                winTrackerCSVWriter.writeRun(winTracker);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                winTrackerCSVWriter.writeRun(winTracker);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
     }
