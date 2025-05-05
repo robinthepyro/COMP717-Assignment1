@@ -21,6 +21,9 @@ public class GameSelector {
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
             int choice = getGameChoice();
+                System.out.println(
+                        "Please note, certain games have unlimited depth minimax algorithms disabled to prevent crashes.");
+
 
             // pve mode
             if (humanVsAi) {

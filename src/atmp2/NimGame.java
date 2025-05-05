@@ -239,6 +239,7 @@ public class NimGame implements Game {
         // TODO fix the fact that one of the ai players has to be considered a HUMAN
         // player.
         boolean aiIsMaximizing = state.getPlayer() == NimGameState.HUMAN_PLAYER;
+        System.out.println(aiIsMaximizing);
         NimMove move = m.getBestMove(state, aiIsMaximizing);
         System.out.println("AI plays: " + move);
         System.out.println("a");
@@ -252,7 +253,7 @@ public class NimGame implements Game {
 
         // pick ai 1
         System.out.println("Pick Mode for First Player");
-        int firstAIType = MinimaxSetupHelper.pickAiType();
+        int firstAIType = MinimaxSetupHelper.pickValidAiType(VALID_AI_MODES);
         if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
             int xDifficulty = MinimaxSetupHelper.pickDepth();
             firstAI = new Minimax<>(7, firstAIType);
@@ -262,7 +263,7 @@ public class NimGame implements Game {
 
         // pick ai 2
         System.out.println("Pick Mode for Second Player");
-        int secondAITYpe = MinimaxSetupHelper.pickAiType();
+        int secondAITYpe = MinimaxSetupHelper.pickValidAiType(VALID_AI_MODES);
         if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
             int oDifficulty = MinimaxSetupHelper.pickDepth();
             secondAI = new Minimax<>(7, secondAITYpe);
