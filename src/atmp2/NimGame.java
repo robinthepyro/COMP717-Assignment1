@@ -5,12 +5,14 @@ import java.util.Scanner;
 import atmp2.MinimaxSetupHelper;
 import atmp2.NimGameState;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class NimGame implements Game {
     // Constants for Player types
     public static final int AI_PLAYER = 1;
     public static final int HUMAN_PLAYER = 2;
+    public static final List<Integer> VALID_AI_MODES = Arrays.asList(Minimax.AB_LIMITED, Minimax.MINIMAX_LIMITED, Minimax.RANDOM);
     private int mode;
     private NimGameState state;
     private boolean demoOddTurn;
@@ -250,7 +252,7 @@ public class NimGame implements Game {
 
         // pick ai 1
         System.out.println("Pick Mode for First Player");
-        int firstAIType = MinimaxSetupHelper.pickAIType();
+        int firstAIType = MinimaxSetupHelper.pickAiType();
         if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
             int xDifficulty = MinimaxSetupHelper.pickDepth();
             firstAI = new Minimax<>(7, firstAIType);
@@ -260,7 +262,7 @@ public class NimGame implements Game {
 
         // pick ai 2
         System.out.println("Pick Mode for Second Player");
-        int secondAITYpe = MinimaxSetupHelper.pickAIType();
+        int secondAITYpe = MinimaxSetupHelper.pickAiType();
         if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
             int oDifficulty = MinimaxSetupHelper.pickDepth();
             secondAI = new Minimax<>(7, secondAITYpe);

@@ -23,6 +23,7 @@ public class TVDGame implements Game {
     public Minimax<TVDMove, TVDState> minimax;
     public TVDState state;
     public Scanner scanner = new Scanner(System.in);
+    public static final List<Integer> VALID_AI_MODES = Arrays.asList(Minimax.AB_LIMITED, Minimax.MINIMAX_LIMITED, Minimax.RANDOM);
     public Random rand = new Random();
     boolean humanPlaysAsTiger;
     int mode;

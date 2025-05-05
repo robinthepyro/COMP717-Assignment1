@@ -3,6 +3,8 @@ package atmp2;
 
 import java.util.Scanner;
 
+import atmp2.TVDGame;
+
 public class GameSelector {
     private static Scanner scanner = new Scanner(System.in);
     private Game game;
@@ -26,23 +28,23 @@ public class GameSelector {
                 switch (choice) {
                     case 1:
                         // Setup for Tic Tac Toe
-                        mode = MinimaxSetupHelper.pickAIType();
+                        mode = MinimaxSetupHelper.pickAiType();
                         Game game = new TicTacToeGame(mode);
                         game.run();
                         break;
                     case 2:
                         // Setup for Nim Game
-                        mode = MinimaxSetupHelper.pickAIType();
+                        mode = MinimaxSetupHelper.pickValidAiType(NimGame.VALID_AI_MODES);
                         game = new NimGame(mode);
                         game.run();
                         break;
                     case 3:
-                        mode = MinimaxSetupHelper.pickAIType();
+                        mode = MinimaxSetupHelper.pickAiType();
                         game = new CoinGame(mode);
                         game.run();
                         break;
                     case 4:
-                        mode = MinimaxSetupHelper.pickAIType();
+                        mode = MinimaxSetupHelper.pickValidAiType(TVDGame.VALID_AI_MODES);
                         game = new TVDGame(mode);
                         game.run();
                         break;
@@ -133,7 +135,7 @@ public class GameSelector {
     }
 
     private static boolean playerVsAi() {
-        System.out.println("Would you like to play human vs ai or view and AI vs AI demo? [P]lay [d]emo [q]uit: ");
+        System.out.println("Would you like to play vs AI, watch a demo, or quit? [p|d|q]");
         while (true) {
             String raw = scanner.nextLine().toLowerCase();
             if (raw.length() == 0) {
@@ -145,8 +147,11 @@ public class GameSelector {
                     return true;
                 case 'd':
                     return false;
+                case 'q':
+                    System.out.println("Exiting...");
+                    System.exit(0);
                 default:
-                    System.out.println("Invalid Selection, enter [P]lay [d]emo or [q]uit");
+                    System.out.println("Invalid Selection, please enter one of [p | d | q]");
             }
         }
     }

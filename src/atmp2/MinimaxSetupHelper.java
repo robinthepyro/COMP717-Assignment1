@@ -8,7 +8,7 @@ import atmp2.Minimax;
 public class MinimaxSetupHelper {
     private static final Scanner scanner = new Scanner(System.in);
 
-    public static int pickAIType() {
+    public static int pickAiType() {
         System.out.println("Select AI type");
         System.out.println("1. depth limited alpha beta pruned minimax");
         System.out.println("2. complete alpha beta pruned minimax");

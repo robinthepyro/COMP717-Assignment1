@@ -18,7 +18,7 @@ public class TicTacToeGame implements Game {
 
     public TicTacToeGame(int minimaxMode) {
         this.minimaxMode = minimaxMode;
-        this.state = new TicTacToeGameState(4);
+        this.state = new TicTacToeGameState(3);
         this.playerIsX = pickTicTacToePlayerChar();
     }
 
@@ -170,7 +170,7 @@ public class TicTacToeGame implements Game {
 
         // pick ai 1
         System.out.println("Pick mode for X");
-        int xAiType = MinimaxSetupHelper.pickAIType();
+        int xAiType = MinimaxSetupHelper.pickAiType();
         if (xAiType == Minimax.AB_LIMITED || xAiType == Minimax.MINIMAX_LIMITED) {
             int xDifficulty = MinimaxSetupHelper.pickDepth();
             xAi = new Minimax<>(xAiType, xDifficulty);
@@ -181,7 +181,7 @@ public class TicTacToeGame implements Game {
         }
 
         // pick ai 2
-        int oAiType = MinimaxSetupHelper.pickAIType();
+        int oAiType = MinimaxSetupHelper.pickAiType();
         if (oAiType == Minimax.AB_LIMITED || oAiType == Minimax.MINIMAX_LIMITED) {
             int oDifficulty = MinimaxSetupHelper.pickDepth();
             oAi = new Minimax<>(oAiType);

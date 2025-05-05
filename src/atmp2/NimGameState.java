@@ -124,7 +124,7 @@ public class NimGameState implements GameState<NimMove> {
      @Override
      public int evaluate() {
          if (isTerminal()) {
-             return (player == AI_PLAYER) ? Integer.MIN_VALUE: Integer.MAX_VALUE;
+             return (player == AI_PLAYER) ? Integer.MAX_VALUE: Integer.MIN_VALUE;
          }
          return 0;
      }
