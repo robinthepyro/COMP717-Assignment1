@@ -3,74 +3,106 @@ package atmp2;
 
 import java.util.Scanner;
 
-import atmp2.CoinGame;
-import atmp2.TigerRewriteGame;
-
 public class GameSelector {
     private static Scanner scanner = new Scanner(System.in);
+    private Game game;
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Game Selector!");
         boolean play = true;
-        
+        boolean humanVsAi = playerVsAi();
         while (play) {
-            System.out.println("Choose a game to play:");
+            System.out.println("Choose a game to " + (humanVsAi ? "play" : "demo"));
             System.out.println("1. Tic Tac Toe");
             System.out.println("2. Nim Game");
             System.out.println("3. Coin Game");
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
-
             int choice = getGameChoice();
+            System.out.println(
+                    "Please note, certain games have unlimited depth minimax algorithms disabled to prevent crashes.");
 
-            switch (choice) {
-                case 1:
-                    // Setup for Tic Tac Toe
-                    boolean playerIsX = pickTicTacToePlayerChar();
-                    int difficulty = pickTicTacToeDifficulty();
-                    TicTacToeGame ticTacToeGame = new TicTacToeGame(playerIsX, difficulty);
-                    ticTacToeGame.run();
-                    break;
-                case 2:
-                    // Setup for Nim Game
-                    NimGame nimGame = new NimGame();
-                    nimGame.run();
-                    break;
-                case 3:
-                    CoinGame coinGame = new CoinGame();
-                    coinGame.run();
-                    break;
-                case 4:
-                    TigerRewriteGame tigerVsDogsGame = new TigerRewriteGame();
-                    tigerVsDogsGame.run();
-                    break;
+            // pve mode
+            if (humanVsAi) {
+                int mode;
+                switch (choice) {
+                    case 1:
+                        // Setup for Tic Tac Toe
+                        mode = MinimaxSetupHelper.pickAiType();
+                        Game game = new TicTacToeGame(mode);
+                        game.run();
+                        break;
+                    case 2:
+                        // Setup for Nim Game
+                        mode = MinimaxSetupHelper.pickValidAiType(NimGame.VALID_AI_MODES);
+                        game = new NimGame(mode);
+                        game.run();
+                        break;
+                    case 3:
+                        mode = MinimaxSetupHelper.pickAiType();
+                        game = new CoinGame(mode);
+                        game.run();
+                        break;
+                    case 4:
+                        mode = MinimaxSetupHelper.pickValidAiType(TVDGame.VALID_AI_MODES);
+                        game = new TVDGame(mode);
+                        game.run();
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        scanner.close();
+                        return; // Exit the program
+                    default:
+                        System.out.println("Invalid choice. Please select a valid game.");
+                        break;
+                }
+            } else {
 
-                case 5:
-                    System.out.println("Exiting...");
-                    scanner.close();
-                    return;  // Exit the program
-                default:
-                    System.out.println("Invalid choice. Please select a valid game.");
-                    break;
+                switch (choice) {
+                    case 1:
+                        // Setup for Tic Tac Toe
+                        Game game = new TicTacToeGame();
+                        game.demo();
+                        break;
+                    case 2:
+                        // Setup for Nim Game
+                        game = new NimGame();
+                        game.demo();
+                        break;
+                    case 3:
+                        game = new CoinGame();
+                        game.demo();
+                        break;
+                    case 4:
+                        game = new TVDGame();
+                        game.demo();
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        scanner.close();
+                        return; // Exit the program
+                    default:
+                        System.out.println("Invalid choice. Please select a valid game.");
+                        break;
+                }
+                play = playAgain();
             }
-            play = playAgain();
         }
     }
 
-    public static boolean playAgain(){
+    public static boolean playAgain() {
         boolean valid = false;
         boolean choice = false;
         String input = "";
-        while(!valid){
+        while (!valid) {
             System.out.println("Play Another Game? [y|N]");
             input = scanner.nextLine();
             input = input.toLowerCase();
 
-            if (input.length() == 0){
+            if (input.length() == 0) {
                 return false;
-            }
-            else {
-                switch(input.charAt(0)){
+            } else {
+                switch (input.charAt(0)) {
                     case 'y':
                         return true;
                     case 'n':
@@ -88,7 +120,7 @@ public class GameSelector {
         int choice = -1;
         // TODO fix this hardcoded garbage?
         while (choice < 1 || choice > 5) {
-            System.out.print("Enter your choice (1, 2, or 3 to Exit): ");
+            System.out.print("Enter your choice (1, 2, 3, 4 or 5 to Exit): ");
             try {
                 choice = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
@@ -98,42 +130,53 @@ public class GameSelector {
         return choice;
     }
 
-    private static void test(){
+    private static void test() {
         System.out.println(playAgain());
     }
 
-    private static boolean pickTicTacToePlayerChar() {
-        String input;
-        boolean playerIsX = false;
+    private static boolean playerVsAi() {
+        System.out.println("Would you like to play vs AI, watch a demo, or quit? [p|d|q]");
         while (true) {
-            System.out.print("Do you want to play as X (goes first) or O (goes second)? ");
-            input = scanner.nextLine().toUpperCase();
-            if (input.equals("X")) {
-                playerIsX = true;
-                break;
-            } else if (input.equals("O")) {
-                playerIsX = false;
-                break;
-            } else {
-                System.out.println("Invalid input. Please enter X or O.");
+            String raw = scanner.nextLine().toLowerCase();
+            if (raw.length() == 0) {
+                return true;
+            }
+            char choice = raw.charAt(0);
+            switch (choice) {
+                case 'p':
+                    return true;
+                case 'd':
+                    return false;
+                case 'q':
+                    System.out.println("Exiting...");
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid Selection, please enter one of [p | d | q]");
             }
         }
-        return playerIsX;
     }
 
-    private static int pickTicTacToeDifficulty() {
-        int difficulty = -1;
-        while (difficulty < 1 || difficulty > 10) {
-            System.out.print("Enter AI difficulty (1-10): ");
+    private static int pickMinimaxMode() {
+        while (true) {
+            // int ABLIMITED = 0;
+            // int ABCOMPLETE = 1;
+            // int MINIMAXLIMITED = 2;
+            // int MINIMAXCOMPLETE = 3;
+
+            System.out.println("Select a mode");
+            System.out.println("1. depth limited alpha beta pruned minimax");
+            System.out.println("2. complete alpha beta pruned minimax");
+            System.out.println("3. depth limited minimax");
+            System.out.println("4. complete minimax");
+
             try {
-                difficulty = Integer.parseInt(scanner.nextLine());
-                if (difficulty < 1 || difficulty > 10) {
-                    System.out.println("Please enter a number between 1 and 10.");
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice > 0 && choice < 4) {
+                    return choice - 1;
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
+                System.out.println("Invalid Selection");
             }
         }
-        return difficulty;
     }
 }

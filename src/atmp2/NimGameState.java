@@ -3,19 +3,17 @@ package atmp2;
 import java.util.*;
 
 public class NimGameState implements GameState<NimMove> {
+    public static final int AI_PLAYER = 1;
+    public static final int HUMAN_PLAYER = 2;
+
+    private static final int[] defaultGameState = { 1, 3, 5, 7, 5, 2, 1 };
+    // private static int[] defaultGameState = {10,10,10,10,10,10};
+
     private int[] piles;
     private int player;
 
-    // these two constants really are an ugly way of doing this
-    // ideally this gamestate shouldn't care who is making what moves
-    // and should be portable to human vs human games
-    // TODO refactor this shitty code
-    private static final int AI_PLAYER = 1;
-    private static final int HUMAN_PLAYER = 2;
-    private static final int[] defaultGameState = {1,3,5,7,5,3,1};
-    // private static int[] defaultGameState = {10,10,10,10,10,10};
-
-    // yes yes, the multiple constructors are goofy, no I don't feel like changing it
+    // yes yes, the multiple constructors are goofy, no I don't feel like changing
+    // it
     public NimGameState(int[] initialPiles, int player) {
         this.piles = Arrays.copyOf(initialPiles, initialPiles.length);
         this.player = player;
@@ -33,19 +31,23 @@ public class NimGameState implements GameState<NimMove> {
         this(defaultGameState, humanStarts ? HUMAN_PLAYER : AI_PLAYER);
     }
 
-	public int getPlayer() {
-		return player;
-	}
+    public int[] getPiles() {
+        return piles;
+    }
 
-	public void setPlayer(int player) {
-		this.player = player;
-	}
+    public int getPlayer() {
+        return player;
+    }
 
-    public void switchPlayer(){
+    public void setPlayer(int player) {
+        this.player = player;
+    }
+
+    public void switchPlayer() {
         player = (player == AI_PLAYER) ? HUMAN_PLAYER : AI_PLAYER;
     }
 
-    public NimGameState clone(){
+    public NimGameState clone() {
         return new NimGameState(piles, player);
     }
 
@@ -68,12 +70,16 @@ public class NimGameState implements GameState<NimMove> {
         List<NimMove> moves = new ArrayList<>();
         for (int i = 0; i < piles.length; i++) {
             int pileSize = piles[i];
-            if (pileSize == 0) continue;
+            if (pileSize == 0)
+                continue;
 
             // Always add small strategic moves (1 and 2)
-            if (pileSize >= 1) moves.add(new NimMove(i, 1));
-            if (pileSize >= 2) moves.add(new NimMove(i, 2));
-            if (pileSize >= 3) moves.add(new NimMove(i, 3));
+            if (pileSize >= 1)
+                moves.add(new NimMove(i, 1));
+            if (pileSize >= 2)
+                moves.add(new NimMove(i, 2));
+            if (pileSize >= 3)
+                moves.add(new NimMove(i, 3));
 
             // Add max and max-1 (if meaningful)
             if (pileSize > 3) {
@@ -102,32 +108,25 @@ public class NimGameState implements GameState<NimMove> {
         switchPlayer();
     }
 
-
     @Override
-    public boolean isTerminal(){
-        for (int pips: piles){
+    public boolean isTerminal() {
+        for (int pips : piles) {
             if (pips > 0) {
                 return false;
             }
         }
         return true;
     }
-    
+
+    // simplest evaluation of gamestate is to check who won
+    // We don't really need to bother with Nim Sum calculations
+    // because this just works.
     @Override
     public int evaluate() {
-        if (isTerminal()){
-            return (player == 1)? 1 : -1;
+        if (isTerminal()) {
+            return (player == AI_PLAYER) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         }
         return 0;
     }
 
-
-    // TODO make this pretty again
-    // I want the piles printed vertically and with nice spacing and annotations
-    public void displayGameState() {
-        System.out.println("Current Game State:");
-        for (int i = 0; i < piles.length; i++) {
-            System.out.printf("Pile %d: %s (%d)\n", i, "● ".repeat(piles[i]), piles[i]);
-        }
-    }
 }
