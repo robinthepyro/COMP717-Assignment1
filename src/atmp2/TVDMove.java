@@ -17,13 +17,14 @@ public class TVDMove implements Move<TVDMove> {
         this.priority = 0;
     }
 
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
     public Coord getStartNode() {
         return startNode;
     }
+
     public Coord getEndNode() {
         return endNode;
     }
@@ -38,7 +39,8 @@ public class TVDMove implements Move<TVDMove> {
 
     @Override
     public TVDMove clone() {
-        // Return a new TigerVsDogsMove with the same startNode, endNode, and deadDogs list
+        // Return a new TigerVsDogsMove with the same startNode, endNode, and deadDogs
+        // list
         TVDMove clonedMove = new TVDMove(this.startNode, this.endNode);
         clonedMove.setDeadDogs(new ArrayList<>(this.deadDogs)); // Create a new list for deadDogs
         return clonedMove;
@@ -46,8 +48,10 @@ public class TVDMove implements Move<TVDMove> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TVDMove other = (TVDMove) o;
         return startNode == other.startNode && endNode == other.endNode && deadDogs.equals(other.deadDogs);
     }

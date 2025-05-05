@@ -11,14 +11,16 @@ public class DurationTracker implements CSVExportable {
     private long startTime;
 
     public void startTracking() {
-        if (running) return;
+        if (running)
+            return;
 
         startTime = System.nanoTime();
         running = true;
     }
 
     public void stopTracking() {
-        if (!running) return;
+        if (!running)
+            return;
 
         long duration = System.nanoTime() - startTime;
         running = false;

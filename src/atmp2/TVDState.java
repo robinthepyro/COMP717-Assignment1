@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import atmp2.TigerVsDogsMove;
-
 public class TVDState implements GameState<TVDMove> {
     public int numEaten;
     public boolean tigerTurn;
@@ -217,7 +215,7 @@ public class TVDState implements GameState<TVDMove> {
     public List<TVDMove> getOptimisedValidMoves() {
         List<TVDMove> ret = getValidMoves();
         // this stupid hack is load bearing :(
-        for (TVDMove move: ret){
+        for (TVDMove move : ret) {
             applyMove(move);
             move.setPriority(getEmptyAdjacent(getTigerPos()).size());
             undoMove(move);

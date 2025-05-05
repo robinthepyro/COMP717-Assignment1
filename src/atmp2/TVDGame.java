@@ -5,14 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Stack;
-
-import atmp2.Minimax;
-import atmp2.MinimaxHelper;
-import atmp2.NimGame;
-import atmp2.TicTacToeGame;
-import atmp2.TigerGameStateRewrite;
-import atmp2.TigerVsDogsMove;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Random;

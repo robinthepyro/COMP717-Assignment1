@@ -3,7 +3,6 @@ package atmp2;
 import java.util.Map;
 import java.util.Random;
 
-
 public class Minimax<M extends Move<M>, S extends GameState<M>> {
     private int maxDepth;
     private int nodesEvaluated;

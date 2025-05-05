@@ -5,7 +5,7 @@ enum Side {
     RIGHT
 }
 
-public class CoinGameMove  implements Move<CoinGameMove>{
+public class CoinGameMove implements Move<CoinGameMove> {
     public final Side side;
     public final int player;
 

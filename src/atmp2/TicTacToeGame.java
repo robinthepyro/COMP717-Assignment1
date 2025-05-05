@@ -2,10 +2,6 @@ package atmp2;
 
 import java.util.Scanner;
 
-import atmp2.MinimaxSetupHelper;
-import atmp2.TicTacToeGameState;
-import atmp2.TicTacToeMove;
-
 public class TicTacToeGame implements Game {
     private static final int X_PLAYER = 1;
     private static final int O_PLAYER = 2;

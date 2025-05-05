@@ -9,10 +9,11 @@ public class MemoryTracker implements CSVExportable {
     private ArrayList<Long> memoryFrames = new ArrayList<>();
     private final AtomicBoolean running = new AtomicBoolean(false);
     private Thread trackerThread;
-    private int resolution = 1;  // in ms, smaller is higher resolution
+    private int resolution = 1; // in ms, smaller is higher resolution
 
     public void startTracking() {
-        if (running.get()) return; // prevent the tracker instance being started multiple times.
+        if (running.get())
+            return; // prevent the tracker instance being started multiple times.
 
         running.set(true);
         trackerThread = new Thread(() -> {

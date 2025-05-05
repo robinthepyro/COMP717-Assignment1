@@ -3,8 +3,6 @@ package atmp2;
 import java.util.List;
 import java.util.Scanner;
 
-import atmp2.Minimax;
-
 public class MinimaxSetupHelper {
     private static final Scanner scanner = new Scanner(System.in);
 

@@ -1,10 +1,6 @@
 package atmp2;
 
 import java.util.Scanner;
-
-import atmp2.MinimaxSetupHelper;
-import atmp2.NimGameState;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +8,8 @@ public class NimGame implements Game {
     // Constants for Player types
     public static final int AI_PLAYER = 1;
     public static final int HUMAN_PLAYER = 2;
-    public static final List<Integer> VALID_AI_MODES = Arrays.asList(Minimax.AB_LIMITED, Minimax.MINIMAX_LIMITED, Minimax.RANDOM);
+    public static final List<Integer> VALID_AI_MODES = Arrays.asList(Minimax.AB_LIMITED, Minimax.MINIMAX_LIMITED,
+            Minimax.RANDOM);
     private int mode;
     private NimGameState state;
     private boolean demoOddTurn;
@@ -49,8 +46,7 @@ public class NimGame implements Game {
             System.out.println(mode);
             int depth = getMinimaxDepth();
             minimax = new Minimax<>(depth, mode);
-        }
-        else {
+        } else {
             minimax = new Minimax<>(mode);
         }
 
@@ -290,7 +286,6 @@ public class NimGame implements Game {
             if (state.isTerminal()) {
                 break;
             }
-
 
             try {
                 Thread.sleep(500);

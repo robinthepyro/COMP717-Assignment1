@@ -121,12 +121,12 @@ public class NimGameState implements GameState<NimMove> {
     // simplest evaluation of gamestate is to check who won
     // We don't really need to bother with Nim Sum calculations
     // because this just works.
-     @Override
-     public int evaluate() {
-         if (isTerminal()) {
-             return (player == AI_PLAYER) ? Integer.MAX_VALUE: Integer.MIN_VALUE;
-         }
-         return 0;
-     }
-    
+    @Override
+    public int evaluate() {
+        if (isTerminal()) {
+            return (player == AI_PLAYER) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        }
+        return 0;
+    }
+
 }
