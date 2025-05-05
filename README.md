@@ -12,8 +12,10 @@ Java 21 or Java 11. (That's it!)
 #### From Source
 1. Clone the repository `git clone https://github.com/robinthepyro/COMP717-Assignment1.git`
 2. Move into `COMP717-Assignment1/src`
-3. Compile the entire `atmp2` package (on UNIX based systems this can be done with `javac atmp/*.java`)
-4. Run the GameSelector class. (again, on UNIX based systems this can be done with `java atmp.GameSelector`)
+3. Compile the `atmp2` package
+(UNIX `javac atmp/*.java`)
+(WINDOWS `javac .\atmp2\*.java`)
+4. Run the GameSelector class. `java atmp.GameSelector`
 
 #### From the .jar (Recommended)
 1. Download the .jar.
@@ -26,4 +28,3 @@ Java 21 or Java 11. (That's it!)
 Robin Savage - 22180180 (cnw8457@autuni.ac.nz)
 
 Benjamin Mitchell - 23199999 (ncq3116@autuni.ac.nz)
-
