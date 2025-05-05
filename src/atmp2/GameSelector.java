@@ -12,15 +12,13 @@ public class GameSelector {
         boolean play = true;
         boolean humanVsAi = playerVsAi();
         while (play) {
-            System.out.println("Choose a game to " + (humanVsAi ? "play" : "demo"));
+        System.out.println("Choose a game to " + (humanVsAi ? "play" : "demo"));
             System.out.println("1. Tic Tac Toe");
             System.out.println("2. Nim Game");
             System.out.println("3. Coin Game");
             System.out.println("4. Tiger Vs Dogs Game");
             System.out.println("5. Exit");
             int choice = getGameChoice();
-            System.out.println(
-                    "Please note, certain games have unlimited depth minimax algorithms disabled to prevent crashes.");
 
             // pve mode
             if (humanVsAi) {
@@ -34,6 +32,8 @@ public class GameSelector {
                         break;
                     case 2:
                         // Setup for Nim Game
+                        System.out.println(
+                        "This Game Has Certain Minimax Modes Disabled to Prevent Crashes");
                         mode = MinimaxSetupHelper.pickValidAiType(NimGame.VALID_AI_MODES);
                         game = new NimGame(mode);
                         game.run();
@@ -44,6 +44,7 @@ public class GameSelector {
                         game.run();
                         break;
                     case 4:
+                        "This Game Has Certain Minimax Modes Disabled to Prevent Crashes");
                         mode = MinimaxSetupHelper.pickValidAiType(TVDGame.VALID_AI_MODES);
                         game = new TVDGame(mode);
                         game.run();
