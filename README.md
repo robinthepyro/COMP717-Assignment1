@@ -24,7 +24,7 @@ JDK 21 (That's it!)
 
 ##### IMPORTANT! If you set the minimax search depth too high compute times can get unreasonably long. Ctrl+C to force quit the program and try again.
 
-### Coded By
+### Authored By
 Robin Savage - 22180180 (cnw8457@autuni.ac.nz)
 
 Benjamin Mitchell - 23199999 (ncq3116@autuni.ac.nz)
