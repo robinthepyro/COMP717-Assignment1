@@ -11,6 +11,8 @@ public class CoinGame implements Game {
     private int gameSize;
     private WinTracker winTracker = new WinTracker();
     private CSVWriter<WinTracker> winTrackerCSVWriter = new CSVWriter<>("coingame wins");
+    private boolean demoOddTurn;
+    private CoinGameState state;
 
     // Demo mode stuff
     private boolean demoMode; // True when AI vs AI
@@ -46,7 +48,9 @@ public class CoinGame implements Game {
         this.aiMode = Minimax.AB_LIMITED;
         this.playerAiMode = Minimax.AB_LIMITED;
         this.demoMinmaxDepth = 50;
+        this.state = new CoinGameState(0, 20);
 
+        this.demoOddTurn = true;
         LocalDateTime timestamp = LocalDateTime.now();
         this.aiMemoryTracker = new MemoryTracker();
         this.aiMemoryTrackerCSVWriter = new CSVWriter<>("coingame ai memory", timestamp);
@@ -67,8 +71,7 @@ public class CoinGame implements Game {
         playGame(state);
     }
 
-    @Override
-    public void demo() {
+    public void demoOld() {
         demoMode = true;
 
         // init game etc
@@ -107,8 +110,7 @@ public class CoinGame implements Game {
 
     private CoinGameState initializeGame() {
         boolean playerStarts = getPlayerStartChoice();
-        int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN :
-                CoinGameState.PLAYER_AI;
+        int chosenStartPlayer = playerStarts ? CoinGameState.PLAYER_HUMAN : CoinGameState.PLAYER_AI;
 
         CoinGameState state = new CoinGameState(chosenStartPlayer, gameSize);
 
@@ -140,7 +142,8 @@ public class CoinGame implements Game {
 
     private void playGame(CoinGameState state) {
         while (true) {
-            if (state.isTerminal()) break;
+            if (state.isTerminal())
+                break;
             System.out.println("----------");
             clearScreen();
             System.out.println(state);
@@ -190,22 +193,30 @@ public class CoinGame implements Game {
 
     private void handleAIMove(CoinGameState state) {
         System.out.println("AI is thinking...");
-        if (aiMemoryTracker != null) aiMemoryTracker.startTracking();
-        if (aiDurationTracker != null) aiDurationTracker.startTracking();
+        if (aiMemoryTracker != null)
+            aiMemoryTracker.startTracking();
+        if (aiDurationTracker != null)
+            aiDurationTracker.startTracking();
         CoinGameMove bestMove = aiMinMax.getBestMove(state, true);
-        if (aiDurationTracker != null) aiDurationTracker.stopTracking();
-        if (aiMemoryTracker != null) aiMemoryTracker.stopTracking();
+        if (aiDurationTracker != null)
+            aiDurationTracker.stopTracking();
+        if (aiMemoryTracker != null)
+            aiMemoryTracker.stopTracking();
         System.out.println("AI plays: " + bestMove);
         state.applyMove(bestMove);
     }
 
     private void handlePlayerAiMove(CoinGameState state) {
         System.out.println("Player AI is thinking...");
-        if (playerAiMemoryTracker != null) playerAiMemoryTracker.startTracking();
-        if (playerAiDurationTracker != null) playerAiDurationTracker.startTracking();
+        if (playerAiMemoryTracker != null)
+            playerAiMemoryTracker.startTracking();
+        if (playerAiDurationTracker != null)
+            playerAiDurationTracker.startTracking();
         CoinGameMove bestMove = playerAiMinMax.getBestMove(state, false);
-        if (playerAiDurationTracker != null) playerAiDurationTracker.stopTracking();
-        if (playerAiMemoryTracker != null) playerAiMemoryTracker.stopTracking();
+        if (playerAiDurationTracker != null)
+            playerAiDurationTracker.stopTracking();
+        if (playerAiMemoryTracker != null)
+            playerAiMemoryTracker.stopTracking();
         System.out.println("AI plays: " + bestMove);
         state.applyMove(bestMove);
     }
@@ -214,4 +225,66 @@ public class CoinGame implements Game {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
+
+    @Override
+    public void demo() {
+        Minimax<CoinGameMove, CoinGameState> firstAi;
+        int firstAiType = NimGame.pickAIType("First Ai");
+        Minimax<CoinGameMove, CoinGameState> secondAi;
+        if (firstAiType == Minimax.AB_LIMITED || firstAiType == Minimax.MINIMAX_LIMITED) {
+            int firstDifficulty = MinimaxSetupHelper.pickDepth();
+            firstAi = new Minimax<>(firstDifficulty, firstAiType);
+        } else {
+            firstAi = new Minimax<>(firstAiType);
+        }
+
+        int secondAiType = NimGame.pickAIType("Second Ai");
+        if (secondAiType == Minimax.AB_LIMITED || secondAiType == Minimax.MINIMAX_LIMITED) {
+            int secondDifficulty = MinimaxSetupHelper.pickDepth();
+            secondAi = new Minimax<>(secondDifficulty, secondAiType);
+        } else {
+            secondAi = new Minimax<>(secondAiType);
+        }
+
+        while (true) {
+            demoOddTurn = !demoOddTurn;
+            displayState();
+            if (state.isTerminal()) {
+                break;
+            }
+            if (demoOddTurn) {
+                playDemoTurn(firstAi);
+            } else {
+                playDemoTurn(secondAi);
+            }
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        displayState();
+
+        System.out
+                .println("The winner is the "
+                        + ((state.getAiScore() < state.getPlayerScore()) ? "Seocnd AI" : "First AI"));
+        System.out.println("First AI " + state.getAiScore() + "Second AI:" + state.getPlayerScore());
+
+    }
+
+    private void playDemoTurn(Minimax<CoinGameMove, CoinGameState> m) {
+        System.out.println("AI is thinking...");
+        // TODO fix the fact that one of the ai players has to be considered a HUMAN
+        // player.
+        CoinGameMove move = m.getBestMove(state, demoOddTurn);
+        System.out.println("AI plays: " + move);
+        state.applyMove(move);
+    }
+    private void displayState() {
+        clearScreen();
+        System.out.println("─".repeat(state.toString().length()));
+        System.out.println(state);
+        System.out.println("─".repeat(state.toString().length()));
+    }
+
 }
