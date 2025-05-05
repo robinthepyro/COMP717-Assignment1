@@ -6,7 +6,7 @@ In this there is a minimax agent that is capable of playing a variety of games.
 We implemented four such games Nim, TicTacToe, CoinGame, and Tiger Vs Dogs. 
 
 ### Requirements
-Java 21 or Java 11. (That's it!)
+JDK 21 (That's it!)
 
 ### How to Run
 #### From Source
