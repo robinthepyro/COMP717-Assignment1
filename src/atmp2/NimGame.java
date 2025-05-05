@@ -1,8 +1,10 @@
 package atmp2;
 
-import java.util.Scanner;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class NimGame implements Game {
     // Constants for Player types
@@ -133,7 +135,7 @@ public class NimGame implements Game {
     /**
      * Displays the current Misere Nim game state with piles shown vertically.
      * Each pile is represented as a column of tokens.
-     * 
+     *
      * @param state The current game state
      * @param clear Whether to clear the screen before displaying
      */
@@ -203,11 +205,6 @@ public class NimGame implements Game {
         System.out.flush();
     }
 
-    public static void main(String[] args) {
-        NimGame g = new NimGame(Minimax.MINIMAX_LIMITED);
-        g.run();
-    }
-
     public static int pickAIType(String aiName) {
         System.out.println("Select a type for " + aiName);
         System.out.println("1. depth limited alpha beta pruned minimax");
@@ -242,60 +239,153 @@ public class NimGame implements Game {
         state.applyMove(move);
     }
 
+    LocalDateTime timestamp = LocalDateTime.now();
+    String gamePrefix = "scalability";
+
+    MemoryTracker firstAiMemoryTracker = new MemoryTracker();
+    MemoryTracker secondAiMemoryTracker = new MemoryTracker();
+    CSVWriter<MemoryTracker> firstAiMemoryTrackerWriter = new CSVWriter<>("nim " + gamePrefix + " firstAi memory", timestamp);
+    CSVWriter<MemoryTracker> secondAiMemoryTrackerWriter = new CSVWriter<>("nim " + gamePrefix + " secondAi memory", timestamp);
+
+    DurationTracker firstAiDurationTracker = new DurationTracker();
+    DurationTracker secondAiDurationTracker = new DurationTracker();
+    CSVWriter<DurationTracker> firstAiDurationTrackerWriter = new CSVWriter<>("nim " + gamePrefix + " firstAi duration", timestamp);
+    CSVWriter<DurationTracker> secondAiDurationTrackerWriter = new CSVWriter<>("nim " + gamePrefix + " secondAi duration", timestamp);
+
+    WinTracker winTracker = new WinTracker("firstAi_wins", "secondAi_wins");
+    CSVWriter<WinTracker> winTrackerCSVWriter = new CSVWriter<>("nim " + gamePrefix + " wins", timestamp);
+
+    public static int[] generateGameState(int size) {
+        // Ensure size is odd to maintain symmetry
+        if (size < 1) {
+            throw new IllegalArgumentException("Game size must be at least 1.");
+        }
+
+        int[] state = new int[size];
+        int mid = size / 2;
+
+        for (int i = 0; i <= mid; i++) {
+            state[i] = 2 * i + 1; // Increasing odd numbers
+        }
+
+        for (int i = mid + 1; i < size; i++) {
+            state[i] = state[size - i - 1]; // Mirror the first half
+        }
+
+        return state;
+    }
+
     @Override
     public void demo() {
-        Minimax<NimMove, NimGameState> firstAI;
-        Minimax<NimMove, NimGameState> secondAI;
+        for (int gamesize = 7; gamesize < 350; gamesize += 6) {
 
-        // pick ai 1
-        System.out.println("Pick Mode for First Player");
-        int firstAIType = MinimaxSetupHelper.pickValidAiType(VALID_AI_MODES);
-        if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
-            int xDifficulty = MinimaxSetupHelper.pickDepth();
-            firstAI = new Minimax<>(7, firstAIType);
-        } else {
-            firstAI = new Minimax<>(firstAIType);
-        }
+            this.demoOddTurn = true;
+            int[] defaultGameState = generateGameState(gamesize);
 
-        // pick ai 2
-        System.out.println("Pick Mode for Second Player");
-        int secondAITYpe = MinimaxSetupHelper.pickValidAiType(VALID_AI_MODES);
-        if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
-            int oDifficulty = MinimaxSetupHelper.pickDepth();
-            secondAI = new Minimax<>(7, secondAITYpe);
-        } else {
-            secondAI = new Minimax<>(firstAIType);
-        }
+            this.state = new NimGameState(defaultGameState);
 
-        displayGameState(state);
+            Minimax<NimMove, NimGameState> firstAI;
+            Minimax<NimMove, NimGameState> secondAI;
 
-        // stupid workaround to make demoturn be flipped at start of game loop
-        // but must start true so we gotta set it false first
-        demoOddTurn = false;
-        // play game
-        while (true) {
-            demoOddTurn = !demoOddTurn;
+
+            secondAI = new Minimax<>(Minimax.RANDOM);
+            firstAI = new Minimax<>(Minimax.AB_COMPLETE);
+
+//        // pick ai 1
+//        System.out.println("Pick Mode for First Player");
+//        int firstAIType = MinimaxSetupHelper.pickValidAiType(VALID_AI_MODES);
+//        if (firstAIType == Minimax.AB_LIMITED || firstAIType == Minimax.MINIMAX_LIMITED) {
+//            int xDifficulty = MinimaxSetupHelper.pickDepth();
+//            firstAI = new Minimax<>(7, firstAIType);
+//        } else {
+//            firstAI = new Minimax<>(firstAIType);
+//        }
+//
+//        // pick ai 2
+//        System.out.println("Pick Mode for Second Player");
+//        int secondAITYpe = MinimaxSetupHelper.pickValidAiType(VALID_AI_MODES);
+//        if (secondAITYpe == Minimax.AB_LIMITED || secondAITYpe == Minimax.MINIMAX_LIMITED) {
+//            int oDifficulty = MinimaxSetupHelper.pickDepth();
+//            secondAI = new Minimax<>(7, secondAITYpe);
+//        } else {
+//            secondAI = new Minimax<>(firstAIType);
+//        }
+
             displayGameState(state);
 
-            if (demoOddTurn) {
-                playDemoTurn(firstAI);
-            } else {
-                playDemoTurn(secondAI);
-            }
+            // stupid workaround to make demoturn be flipped at start of game loop
+            // but must start true so we gotta set it false first
+            demoOddTurn = false;
+            int turns = 3;
+            // play game
+            while (true) {
+                if (turns <= 0) {
+                    break;
+                }
 
-            if (state.isTerminal()) {
-                break;
+
+                demoOddTurn = !demoOddTurn;
+                displayGameState(state);
+
+                if (demoOddTurn) {
+                    firstAiMemoryTracker.startTracking();
+                    firstAiDurationTracker.startTracking();
+                    playDemoTurn(firstAI);
+                    firstAiDurationTracker.stopTracking();
+                    firstAiMemoryTracker.stopTracking();
+                    turns--;
+                } else {
+                    secondAiMemoryTracker.startTracking();
+                    secondAiDurationTracker.startTracking();
+                    playDemoTurn(secondAI);
+                    secondAiDurationTracker.stopTracking();
+                    secondAiMemoryTracker.stopTracking();
+                }
+
+                if (state.isTerminal()) {
+                    break;
+                }
+
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException ie) {
+//                Thread.currentThread().interrupt();
+//            }
+            }
+            displayGameState(state);
+            System.out.println("The Game is over");
+            System.out.println("The winner is " + ((demoOddTurn) ? "Player 1" : "Player 2"));
+
+            if (demoOddTurn) {
+                winTracker.playerWins();
+            } else {
+                winTracker.aiWins();
             }
 
             try {
-                Thread.sleep(500);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                firstAiMemoryTrackerWriter.writeRun(firstAiMemoryTracker);
+//            secondAiMemoryTrackerWriter.writeRun(secondAiMemoryTracker);
+                firstAiDurationTrackerWriter.writeRun(firstAiDurationTracker);
+//            secondAiDurationTrackerWriter.writeRun(secondAiDurationTracker);
+                firstAiMemoryTracker.resetTracker();
+//            secondAiMemoryTracker.resetTracker();
+                firstAiDurationTracker.resetTracker();
+//            secondAiDurationTracker.resetTracker();
+//            winTrackerCSVWriter.writeRun(winTracker);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        displayGameState(state);
-        System.out.println("The Game is over");
-        System.out.println("The winner is " + ((demoOddTurn) ? "Player 1" : "Player 2"));
+
+    }
+
+    public static void main(String[] args) {
+//        NimGame g = new NimGame(Minimax.MINIMAX_LIMITED);
+//        g.run();
+
+        NimGame g = new NimGame();
+
+        g.demo();
     }
 
 }

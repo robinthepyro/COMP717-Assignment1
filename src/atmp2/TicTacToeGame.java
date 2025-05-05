@@ -1,5 +1,7 @@
 package atmp2;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class TicTacToeGame implements Game {
@@ -9,8 +11,9 @@ public class TicTacToeGame implements Game {
     private TicTacToeGameState state;
     private Minimax<TicTacToeMove, TicTacToeGameState> minimax;
     private static Scanner scanner = new Scanner(System.in);
-    private final boolean playerIsX;
+    private boolean playerIsX;
     int minimaxMode;
+
 
     public TicTacToeGame(int minimaxMode) {
         this.minimaxMode = minimaxMode;
@@ -160,62 +163,135 @@ public class TicTacToeGame implements Game {
         state.applyMove(move);
     }
 
+    // Testing shenanigans
+    // player is x, ai is o
+    LocalDateTime timestamp = LocalDateTime.now();
+    String gamePrefix = "scalability";
+
+    MemoryTracker xAiMemoryTracker = new MemoryTracker();
+    MemoryTracker oAiMemoryTracker = new MemoryTracker();
+    CSVWriter<MemoryTracker> xAiMemoryTrackerWriter = new CSVWriter<>("tictactoe " + gamePrefix + " xAi memory", timestamp);
+    CSVWriter<MemoryTracker> oAiMemoryTrackerWriter = new CSVWriter<>("tictactoe " + gamePrefix + " oAi memory", timestamp);
+
+    DurationTracker xAiDurationTracker = new DurationTracker();
+    DurationTracker oAiDurationTracker = new DurationTracker();
+    CSVWriter<DurationTracker> xAiDurationTrackerWriter = new CSVWriter<>("tictactoe " + gamePrefix + " xAi duration", timestamp);
+    CSVWriter<DurationTracker> oAiDurationTrackerWriter = new CSVWriter<>("tictactoe " + gamePrefix + " oAi duration", timestamp);
+
+    WinTracker winTracker = new WinTracker("xAi_wins", "oAi_wins");
+    CSVWriter<WinTracker> winTrackerCSVWriter = new CSVWriter<>("tictactoe " + gamePrefix + " wins", timestamp);
+
+    // --- end test shenanigans
+
     public void demo() {
-        Minimax<TicTacToeMove, TicTacToeGameState> xAi;
-        Minimax<TicTacToeMove, TicTacToeGameState> oAi;
+        for (int boardsize = 3; boardsize < 45; boardsize += 2) {
+            for (int round = 1; round < 3; round++) {
+                this.state = new TicTacToeGameState(boardsize);
+                this.playerIsX = true;
 
-        // pick ai 1
-        System.out.println("Pick mode for X");
-        int xAiType = MinimaxSetupHelper.pickAiType();
-        if (xAiType == Minimax.AB_LIMITED || xAiType == Minimax.MINIMAX_LIMITED) {
-            int xDifficulty = MinimaxSetupHelper.pickDepth();
-            xAi = new Minimax<>(xAiType, xDifficulty);
-        } else if (xAiType == 5) {
-            xAi = new Minimax<>(0);
-        } else {
-            xAi = new Minimax<>(xAiType);
-        }
+                Minimax<TicTacToeMove, TicTacToeGameState> xAi;
+                Minimax<TicTacToeMove, TicTacToeGameState> oAi;
 
-        // pick ai 2
-        int oAiType = MinimaxSetupHelper.pickAiType();
-        if (oAiType == Minimax.AB_LIMITED || oAiType == Minimax.MINIMAX_LIMITED) {
-            int oDifficulty = MinimaxSetupHelper.pickDepth();
-            oAi = new Minimax<>(oAiType);
-        } else {
-            oAi = new Minimax<>(xAiType);
-        }
+                xAi = new Minimax<>(Minimax.AB_COMPLETE);
+                oAi = new Minimax<>(Minimax.RANDOM);
+                // pick ai 1
+                //        System.out.println("Pick mode for X");
+                //        int xAiType = MinimaxSetupHelper.pickAiType();
+                //        if (xAiType == Minimax.AB_LIMITED || xAiType == Minimax.MINIMAX_LIMITED) {
+                //            int xDifficulty = MinimaxSetupHelper.pickDepth();
+                //            xAi = new Minimax<>(xAiType, xDifficulty);
+                //        } else if (xAiType == 5) {
+                //            xAi = new Minimax<>(0);
+                //        } else {
+                //            xAi = new Minimax<>(xAiType);
+                //        }
+                //
+                //        // pick ai 2
+                //        int oAiType = MinimaxSetupHelper.pickAiType();
+                //        if (oAiType == Minimax.AB_LIMITED || oAiType == Minimax.MINIMAX_LIMITED) {
+                //            int oDifficulty = MinimaxSetupHelper.pickDepth();
+                //            oAi = new Minimax<>(oAiType);
+                //        } else {
+                //            oAi = new Minimax<>(xAiType);
+                //        }
 
-        state.displayGameState();
-        // play game
-        while (true) {
-            if (state.isTerminal()) {
-                break;
+                state.displayGameState();
+                // play game
+                while (true) {
+                    if (state.isTerminal()) {
+                        int winner = state.getWinner();
+                        if (winner == 0) {
+                            // draw: do nothing or implement draw tracking
+                            System.out.println("Demo game ended in a draw.");
+                        } else if (winner == X_PLAYER) {
+                            winTracker.playerWins(); // X AI
+                        } else if (winner == O_PLAYER) {
+                            winTracker.aiWins(); // O AI
+                        }
+                        break;
+                    }
+
+                    xAiMemoryTracker.startTracking();
+                    xAiDurationTracker.startTracking();
+                    playDemoTurn(xAi, false);
+                    xAiDurationTracker.stopTracking();
+                    xAiMemoryTracker.stopTracking();
+                    state.displayGameState();
+
+                    //            try {
+                    //                Thread.sleep(500);
+                    //            } catch (InterruptedException ie) {
+                    //                Thread.currentThread().interrupt();
+                    //            }
+                    if (state.isTerminal()) {
+                        int winner = state.getWinner();
+                        if (winner == 0) {
+                            // draw: do nothing or implement draw tracking
+                            System.out.println("Demo game ended in a draw.");
+                        } else if (winner == X_PLAYER) {
+                            winTracker.playerWins(); // X AI
+                        } else if (winner == O_PLAYER) {
+                            winTracker.aiWins(); // O AI
+                        }
+                        break;
+                    }
+
+//                oAiMemoryTracker.startTracking();
+//                oAiDurationTracker.startTracking();
+                    playDemoTurn(oAi, false);
+//                oAiDurationTracker.stopTracking();
+//                oAiMemoryTracker.stopTracking();
+                    state.displayGameState();
+                    //            try {
+                    //                Thread.sleep(500);
+                    //            } catch (InterruptedException ie) {
+                    //                Thread.currentThread().interrupt();
+                    //            }
+                    break;
+                }
+                System.out.println("The Game is over");
+                printDemoResult();
             }
-            playDemoTurn(xAi, false);
-            state.displayGameState();
-
             try {
-                Thread.sleep(500);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
-            if (state.isTerminal()) {
-                break;
-            }
-            playDemoTurn(oAi, false);
-            state.displayGameState();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                xAiMemoryTrackerWriter.writeRun(xAiMemoryTracker);
+                //            oAiMemoryTrackerWriter.writeRun(oAiMemoryTracker);
+                xAiDurationTrackerWriter.writeRun(xAiDurationTracker);
+                //            oAiDurationTrackerWriter.writeRun(oAiDurationTracker);
+                xAiMemoryTracker.resetTracker();
+                //            oAiMemoryTracker.resetTracker();
+                xAiDurationTracker.resetTracker();
+                //            oAiDurationTracker.resetTracker();
+                //            winTrackerCSVWriter.writeRun(winTracker);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        System.out.println("The Game is over");
-        printDemoResult();
     }
 
     public static void main(String[] args) {
-        Game game = new TicTacToeGame(Minimax.AB_COMPLETE);
-        game.run();
+//        Game game = new TicTacToeGame(Minimax.AB_COMPLETE);
+//        game.run();
+        Game game = new TicTacToeGame();
+        game.demo();
     }
 }
