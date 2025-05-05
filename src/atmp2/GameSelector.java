@@ -12,7 +12,7 @@ public class GameSelector {
         boolean play = true;
         boolean humanVsAi = playerVsAi();
         while (play) {
-        System.out.println("Choose a game to " + (humanVsAi ? "play" : "demo"));
+            System.out.println("Choose a game to " + (humanVsAi ? "play" : "demo"));
             System.out.println("1. Tic Tac Toe");
             System.out.println("2. Nim Game");
             System.out.println("3. Coin Game");
@@ -32,8 +32,7 @@ public class GameSelector {
                         break;
                     case 2:
                         // Setup for Nim Game
-                        System.out.println(
-                        "This Game Has Certain Minimax Modes Disabled to Prevent Crashes");
+                        System.out.println("This Game Has Certain Minimax Modes Disabled to Prevent Crashes");
                         mode = MinimaxSetupHelper.pickValidAiType(NimGame.VALID_AI_MODES);
                         game = new NimGame(mode);
                         game.run();
@@ -44,7 +43,8 @@ public class GameSelector {
                         game.run();
                         break;
                     case 4:
-                        "This Game Has Certain Minimax Modes Disabled to Prevent Crashes");
+                        System.out.println(
+                                "This Game Has Certain Minimax Modes Disabled to Prevent Crashes");
                         mode = MinimaxSetupHelper.pickValidAiType(TVDGame.VALID_AI_MODES);
                         game = new TVDGame(mode);
                         game.run();
