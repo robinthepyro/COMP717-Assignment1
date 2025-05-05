@@ -2,8 +2,12 @@
 
 ### About
 This is the code portion of our first Assignment for COMP 717.
-In this there is a minimax agent that is capable of playing a variety of games. 
-We implemented four such games Nim, TicTacToe, CoinGame, and Tiger Vs Dogs. 
+In this we create a Multi Game Playing Agent using the minimax algorithm.
+We implemented toggleable flags for search depth limiting and alpha beta 
+pruning. 
+The four games implemented here are TicTacToe, MisereNim, A Coin Game, and Tiger Vs Dogs.
+You are able to play against the algorithm, or watch a demo of two AI controlled player
+compete against eachother.
 
 ### Requirements
 JDK 21 (That's it!)
